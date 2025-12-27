@@ -1,0 +1,92 @@
+{
+    "Appearance": {
+        "Race": {
+            "Asian": {"tag": "asian", "description": "She is of Asian descent."},
+            "Black": {"tag": "black", "description": "She is of Black descent."},
+            "Latina": {"tag": "latina", "description": "She is of Latin descent."},
+            "White": {"tag": "white", "description": "She is of White/Caucasian descent."}
+        },
+        "Hair": {
+            "Auburn Hair": {"tag": "auburn_hair", "description": "She has auburn hair."},
+            "Blonde Hair": {"tag": "blonde_hair", "description": "She has blonde hair."},
+            "Brown Hair": {"tag": "brown_hair", "description": "She has brown hair."},
+            "Black Hair": {"tag": "black_hair", "description": "She has black hair."},
+            "Red Hair": {"tag": "red_hair", "description": "She has red hair."},
+            "White Hair": {"tag": "white_hair", "description": "She has white hair."},
+            "Colored Hair (Vibrant)": {"tag": "colored_hair", "description": "She has vibrant colored hair (non-natural colors)."},
+            "Blue Hair": {"tag": "blue_hair", "description": "She has distinct blue hair (for custom assets)."}
+        },
+        "Eyes": {
+            "Brown Eyes": {"tag": "brown_eyes", "description": "Common but attractive brown eyes."},
+            "Blue Eyes": {"tag": "blue_eyes", "description": "Striking blue eyes."},
+            "Hazel Eyes": {"tag": "hazel_eyes", "description": "Eyes that shift between green and brown."},
+            "Green Eyes": {"tag": "green_eyes", "description": "Rare green eyes."},
+            "Grey Eyes": {"tag": "grey_eyes", "description": "Neutral grey eyes."},
+            "Black Eyes": {"tag": "black_eyes", "description": "Very dark, black eyes."}
+        },
+        "Boobs & Ass": {
+            "Small Boobs": {"tag": "small_boobs", "description": "She has small perky boobs."},
+            "Average Boobs": {"tag": "average_boobs", "description": "She has average, nice boobs."},
+            "Big Boobs": {"tag": "big_boobs", "description": "Big, attention grabbing boobs (Sensitivity +0.15)."},
+            "Small Ass": {"tag": "small_ass", "description": "She has a small, tight ass."},
+            "Average Ass": {"tag": "average_ass", "description": "She has an average, balanced ass."},
+            "Big Ass": {"tag": "big_ass", "description": "Big attention grabbing ass (Sensitivity +0.15)."},
+            "Small Boobs (Fake)": {"tag": "small_boobs_fake", "description": "Small perky boobs; possibly fake."},
+            "Big Boobs (Fake)": {"tag": "big_boobs_fake", "description": "Big boobs, you don't care if they are fake."},
+            "Natural Boobs": {"tag": "natural_boobs", "description": "She has natural boobs (Sensitivity +0.25)."}
+        }
+    },
+    "Core Personality": {
+        "Mind & Intellect": {
+            "Brilliant": {"tag": "brilliant", "description": "Brilliant mind, very intelligent (INT growth +0.16)."},
+            "Sharp": {"tag": "sharp", "description": "A sharp mind, quite intelligent."},
+            "Noble": {"tag": "noble", "description": "Noble soul, focused on academics."},
+            "Dumb (Negative)": {"tag": "dumb", "description": "Dull mind, writing her name is a challenge (INT growth -0.15).", "is_positive": false}
+        },
+        "Behavior & Obedience": {
+            "Obedient": {"tag": "obedient", "description": "Follows rules as laid out (Obedience +0.15)."},
+            "Rebellious": {"tag": "rebellious", "description": "A rebel, doesn't deal well with authority (Discipline -0.15).", "is_positive": false},
+            "Honest": {"tag": "honest", "description": "Tells everything to her mother (More likely to report).", "is_positive": false},
+            "Secretive": {"tag": "secretive", "description": "Knows how to keep a secret (Less likely to report)."}
+        },
+        "Emotional State": {
+            "Kind": {"tag": "kind", "description": "Kind and very forgiving of bad behaviour."},
+            "Emotional": {"tag": "emotional", "description": "Naturally fearful but responds to affection."},
+            "Cold (Negative)": {"tag_name": "cold", "description": "Can be extremely unpleasant with new people.", "is_positive": false},
+            "Stressed (Negative)": {"tag": "stressed", "description": "Known to break under pressure.", "is_positive": false}
+        }
+    },
+    "Sexual & Kinks": {
+        "Libido": {
+            "Nympho (Super)": {"tag": "nympho", "description": "Extremely horny all the time (Arousal & Corruption +0.15)."},
+            "Horny": {"tag": "horny", "description": "A horny little devil."},
+            "Onanist": {"tag": "onanist", "description": "Loves and embraces masturbating, even in public."},
+            "Provocative": {"tag": "provocative", "description": "Will often dress more provocatively."},
+            "Exhibitionist": {"tag": "exhibitionist", "description": "Enjoys being watched and showing off her body."}
+        },
+        "Kinks & Fluids": {
+            "Anal Slut": {"tag": "anal_slut", "description": "She has learned to love anal (Ass Sensitivity +0.05)."},
+            "Cum Slut": {"tag": "cum_slut", "description": "She loves being covered in cum."},
+            "Cum Dumpster": {"tag": "cum_dumpster", "description": "She loves being filled with cum."},
+            "Squirter": {"tag": "squirter", "description": "When she cums she gushes, making a huge mess."},
+            "Oral Fixation": {"tag": "oral_fixation", "description": "Always has something in her mouth, whether it's a pencil or a cock."}
+        }
+    },
+    "Status & Mod-Specific": {
+        "Financial Status": {
+            "Rich": {"tag": "rich", "description": "Comes from a rich family."},
+            "Broke (Negative)": {"tag": "broke", "description": "Comes from a poor family (Financial Need +0.3).", "is_positive": false},
+            "Modest": {"tag": "modest", "description": "Neither rich nor poor."}
+        },
+        "Game Mechanics": {
+            "Photogenic": {"tag": "photogenic", "description": "Face was made to be photographed (Proficiency +0.25)."},
+            "Pressure Thrives": {"tag": "pressure_thrives", "description": "Performs better the more pressure she's under."},
+            "Freeuse Toy": {"tag": "freeuse_toy", "description": "Doesn't mind being used anytime, anywhere."}
+        },
+        "Mod & Story": {
+            "Stepsister": {"tag": "stepsister", "description": "The player's stepsister, which adds taboo tension."},
+            "Tattooed": {"tag": "tattooed", "description": "She has tattoos that add to her unique style."},
+            "Queen of Spades": {"tag": "queenofs", "description": "Black boy hazy! She's after any truly big cock (Mod Trait)."}
+        }
+    }
+}

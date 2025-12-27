@@ -1,0 +1,79 @@
+{
+    "t-shirt": [
+        "plain",
+        "graphic",
+        "striped"
+    ],
+    "blouse": [
+        "sheer",
+        "ruffled",
+        "satin"
+    ],
+    "jacket": [
+        "denim",
+        "leather",
+        "bomber",
+        "puffer",
+        "sport"
+    ],
+    "dress": [
+        "maid-dress",
+        "nurse-dress",
+        "leather-dress",
+        "latex-dress",
+        "see-through-dress",
+        "satin-dress"
+    ],
+    "skirt": [
+        "pleated",
+        "denim",
+        "leather",
+        "uniform",
+        "transparent",
+        "slutty",
+        "cheerleader",
+        "pencil-skirt"
+    ],
+    "jeans": [
+        "skinny",
+        "regular-fit",
+        "ripped",
+        "bootcut"
+    ],
+    "bra": [ 
+        "lace",
+        "sheer",
+        "open-cup",
+        "transparent",
+        "harness"
+    ],
+    "panty": [ 
+        "lace",
+        "sheer",
+        "crotchless",
+        "harness"
+    ],
+    "thigh-high-stockings": [
+        "plain",
+        "latex",
+        "lace-top",
+        "garter"
+    ],
+    "pantyhose": [
+        "sheer",
+        "opaque",
+        "fishnets"
+    ],
+    "heels": [
+        "stiletto",
+        "platform",
+        "strappy",
+        "pumps"
+    ],
+    "boots": [
+        "ankle-boots",
+        "knee-high-boots",
+        "thigh-high-boots",
+        "combat-boots"
+    ]
+}

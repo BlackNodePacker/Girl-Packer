@@ -1,0 +1,22 @@
+{
+    "photoshoot": {
+        "display_name": "Photoshoot",
+        "media_type": "photo",
+        "config_filename": "photoshoot_config.json"
+    },
+    "videoshoot": {
+        "display_name": "Videoshoot",
+        "media_type": "video",
+        "config_filename": "videoshoot_config.json"
+    },
+    "shared_photoshoot": {
+        "display_name": "Shared_Photoshoot",
+        "media_type": "photo",
+        "config_filename": "shared_photoshoot_config.json"
+    },
+    "shared_videoshoot": {
+        "display_name": "Shared_Videoshoot",
+        "media_type": "video",
+        "config_filename": "shared_videoshoot_config.json"
+    }
+}

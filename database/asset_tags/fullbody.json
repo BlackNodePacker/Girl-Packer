@@ -1,0 +1,24 @@
+{
+    "clothed_states": {
+        "Clothed": "clothed",
+        "Underwear": "underwear",
+        "Bikini": "bikini",
+        "Atheletic": "atheletic",
+        "Lingerie": "lingerie"
+    },
+    "nude_states": {
+        "Topless": "topless",
+        "Nude": "bare",
+        "Bottomless": "bottomless",
+        "In Shower": "shower"
+    },
+    "costume_states": {
+        "Maid": "maid",
+        "swimsuit": "swimsuit",
+        "bikini": "bikini",
+        "Nurse": "nurse",
+        "Uniform": "uniform",
+        "Work": "work",
+        "Cosplay": "cosplay"
+    }
+}

@@ -1,0 +1,138 @@
+{
+    "shoot_subtypes": {
+        "Clothed": "clothed",
+        "Underwear/Bikini": "underwear",
+        "Revealing/Half Nudity": "revealing",
+        "Nude": "nude",
+        "Solo/Masturbation": "softcore",
+        "Lesbian": "lesbian",
+        "Normal Sex": "sex",
+        "Hardcore Sex": "hardcore",
+        "Orgy": "orgy",
+        "Gangbang": "gangbang"
+    },
+    "location_tags": {
+        "Studio": "photo_studio",
+        "Indoor Private": "indoor_private",
+        "Indoor Public": "indoor_public",
+        "Outdoor Private": "outdoor_private",
+        "Outdoor Public": "outdoor_public"
+    },
+    "theme_tags": {
+        "Lingerie": "lingerie",
+        "Bikini": "bikini",
+        "Cosplay": "cosplay",
+        "Bridal": "bridal",
+        "Sex Toy": "sex_toy",
+        "Massage": "massage",
+        "Nature": "nature",
+        "School": "school",
+        "Real Estate": "real_estate",
+        "Office": "office",
+        "Workout": "workout",
+        "BDSM": "bdsm",
+        "Party": "party",
+        "Bathroom": "bathroom",
+        "Bedroom": "bedroom",
+        "Pool": "pool",
+        "Beach": "beach",
+        "Shower": "shower",
+        "Bath": "bath"
+    },
+    "participant_tags": {
+        "Solo": "solo",
+        "Duo": "duo",
+        "Threesome": "threesome",
+        "Orgy / Group": "orgy"
+    },
+    "item_main_tags": {
+        "Clothed (0)": "clothed",
+        "Clothed Skimpy (1)": "half_dressed",
+        "Underwear/Bikini (3)": "underwear",
+        "Revealing i.e Topless/Bottomless (4)": "revealing",
+        "Bare/Naked (5)": "bare",
+        "Softcore i.e Solo Masturbating (7)": "softcore",
+        "Sex/Vanilla Sex (10)": "sex",
+        "Hardcore/More extreme sex (12)": "hardcore"
+    },
+    "item_sub_tags": {
+        "Topless": "notop",
+        "Bottomless": "nobot",
+        "No Face": "noface",
+        "Closeup": "closeup"
+    },
+    "item_thirdparty_tags": {
+        "Male Present": "tp_male",
+        "Another Female Present": "tp_fem",
+        "Group Male Present": "group_male",
+        "Group Female Present": "group_female",
+        "Group Mixed Sexes": "orgy"
+    },
+    "item_action_tags": {
+        "Miscellaneous Actions": {
+            "Kissing": "kiss",
+            "Vague Tease": "tease"
+        },
+        "Undress Actions": {
+            "Girl undress self": "undress_self",
+            "Partner undress girl": "get_undress",
+            "Girl undress partner": "give_undress"
+        },
+        "Showing Body Parts": {
+            "Show Boobs": "show_boobs",
+            "Show Feet": "show_feet",
+            "Show Panties": "show_panty",
+            "Show Pussy": "show_pussy",
+            "Show Ass": "show_ass"
+        },
+        "Playing with Body Parts": {
+            "Play with boobs": "play_boob",
+            "Play with nipples": "play_nipple",
+            "Play with pussy": "play_pussy",
+            "Play with ass": "play_ass",
+            "Play with feet": "play_feet"
+        },
+        "Self Fingering and Fisting": {
+            "Finger own pussy": "finger_pussy_self",
+            "Finger own ass": "finger_ass_self",
+            "Fist own ass": "fist_ass_self",
+            "Fist own pussy": "fist_pussy_self"
+        },
+        "Dildo/Toy Insertion (Self)": {
+            "Dildo/toy in pussy": "dildo_pussy_self",
+            "Dildo/toy in ass": "dildo_anal_self"
+        },
+        "Oral Actions": {
+            "Give oral": "give_oral",
+            "Get oral": "get_oral",
+            "Give rimjob": "give_rimjob",
+            "Get rimjob": "get_rimjob",
+            "Multiple Oral": "multi_oral"
+        },
+        "Manual and Other Stimulation": {
+            "Give handjob": "give_handjob",
+            "Give boobjob": "give_boobjob",
+            "Give footjob": "give_footjob"
+        },
+        "Penetrative Actions": {
+            "Fuck pussy": "vaginal",
+            "Fuck ass": "anal",
+            "Double penetration": "fuck_dp",
+            "Fuck mouth": "face_fuck",
+            "Fuck boobs": "boob_fuck"
+        },
+        "Cumshot Actions": {
+            "Cum on face": "cumshot_face",
+            "Cum on boobs": "cumshot_boobs",
+            "Cum on stomach": "cumshot_stomach",
+            "Cum on pussy": "cumshot_pussy",
+            "Cum on ass": "cumshot_ass",
+            "Cum on feet": "cumshot_feet"
+        },
+        "Creampie Actions": {
+            "Creampie mouth": "creampie_mouth",
+            "Creampie pussy": "creampie_pussy",
+            "Creampie ass": "creampie_ass"
+        }
+    }
+}

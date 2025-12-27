@@ -1,0 +1,229 @@
+{
+  "main_tags": {
+    "Misc": {
+      "Sex Interaction": "sex",
+      "Student": "student"
+    },
+    "Player Sexual Acts": {
+      "Blowjob": "blowjob",
+      "Face/Throat Fuck": "use_mouth",
+      "Facial": "facial",
+      "Lick Ass": "lick_ass",
+      "Lick Pussy": "lick_pussy",
+      "Fuck Ass": "fuck_ass",
+      "Fuck Pussy": "fuck_pussy",
+      "Finger Ass": "finger_ass",
+      "Finger Pussy": "finger_pussy",
+      "Fuck Boobs/Boobjob": "fuck_boobs",
+      "Fucking Thighs/Thighjob": "fuck_thighs",
+      "Player Masturbating": "player_masturbate",
+      "Handjob": "handjob"
+    },
+    "Player Cumshots & Creampies": {
+      "Player solo cumming": "cumshot",
+      "Cumming on thighs": "cumshot_thighs",
+      "Cumming on pussy": "cumshot_pussy",
+      "Creampie Pussy": "creampie_pussy",
+      "Cumming on ass": "cumshot_ass",
+      "Creampie Ass": "creampie_ass",
+      "Creampie Mouth/Cum in Mouth": "creampie_mouth",
+      "Cumming on Boobs": "cumshot_boobs",
+      "Cum In Panties": "cum_in_panties"
+    },
+    "Groping & Touching": {
+      "Grope Thighs": "grope_thighs",
+      "Grope Ass": "grope_ass",
+      "Grope Pussy": "grope_pussy",
+      "Grope Boobs": "grope_boobs",
+      "Playfully Slap Ass": "slap_ass",
+      "Spanking Ass": "spank_ass",
+      "Paddle Ass": "paddle_ass",
+      "Wedgie": "wedgie",
+      "Tease Asshole": "tease_ass",
+      "Tease Clit": "tease_clit",
+      "Playfully Slap Boobs": "slap_boobs",
+      "Pinch Nipples": "pinch_nipples",
+      "Kissing": "kiss"
+    },
+    "Girl-Doing Actions": {
+      "Girl Giving Rimjob": "rimjob",
+      "Girl Masturbating": "masturbate",
+      "Generic Orgasm": "orgasm",
+      "Wear Cum Covered Panties": "wear_cum_panties"
+    },
+    "Buttplug Actions": {
+      "Player Removing Buttplug": "remove_buttplug",
+      "Player inserting Buttplug": "insert_buttplug"
+    },
+    "Gloryhole Activities": {
+      "Gloryhole Blowjob": "gloryhole_blowjob",
+      "Gloryhole Cum In Mouth": "gloryhole_creampie_mouth",
+      "Gloryhole Fuck Pussy": "gloryhole_fuck_pussy",
+      "Gloryhole Creampie Pussy": "gloryhole_creampie_pussy"
+    },
+    "Classroom Lessons": {
+      "Anal Lesson": "anal_lesson",
+      "Oral Lesson": "oral_lesson",
+      "Vaginal Lesson": "vaginal_lesson"
+    },
+    "Miscellaneous Actions": {
+      "Girl Aroused Reaction": "girl_aroused_reaction",
+      "Girl Teasing Ass/Pussy": "tease_lower",
+      "Girl Teasing Mouth/Boobs": "tease_upper",
+      "Rubbing lotion on girl": "lotion_rub",
+      "Girl flashing boobs": "flash_boobs",
+      "Girl flashing pussy": "flash_pussy",
+      "Girl flashing ass": "flash_ass"
+    },
+    "Food & Drink Interactions": {
+      "Cumming on food": "cum_on_food",
+      "Cumming in coffee": "cum_in_coffee",
+      "Drinking coffee with cum": "drink_coffee",
+      "Cumming in drink": "cum_in_drink",
+      "Squirt breast milk in coffee": "milk_in_coffee"
+    },
+    "Pee Fetish Tags": {
+      "Player peeing on girl": "golden_shower",
+      "Girl peeing on player": "reverse_shower",
+      "Girl Peeing/Wetting Herself": "pee"
+    },
+    "Expansion Content Tags": {
+      "Girl sucking players fingers": "suck_fingers",
+      "Player sucking girls nipples": "suck_nipples",
+      "Player sucking girls toes": "suck_toes"
+    }
+  },
+  "clothing_based_main_tags": {
+    "Player Removing Clothing": {
+      "Player Removing Outer": "remove_outer",
+      "Player Removing Upper": "remove_upper",
+      "Player Removing Bra": "remove_bra",
+      "Player Removing Lower": "remove_lower",
+      "Player Removing Panties": "remove_panties",
+      "Player Removing Socks": "remove_socks",
+      "Player Removing Shoes": "remove_shoes"
+    },
+    "Player Removing Specific": {
+      "Player Removing Dress": "remove_dress",
+      "Player Removing Leotard/Onepiece": "remove_onepiece",
+      "Player Removing Shirt": "remove_shirt",
+      "Player Removing Jeans": "remove_jeans",
+      "Player Removing Leggings": "remove_leggings",
+      "Player Removing Skirt": "remove_skirt",
+      "Player Removing Shorts": "remove_shorts",
+      "Player Removing Stockings": "remove_stockings",
+      "Player Removing Pantyhose": "remove_pantyhose",
+      "Player Removing Sneakers": "remove_sneakers",
+      "Player Removing Heels": "remove_heels",
+      "Player Removing Flats(Shoes)": "remove_flats"
+    },
+    "Girl Self-Removing Clothing": {
+      "Girl Removing Outer": "strip_outer",
+      "Girl Removing Upper": "strip_upper",
+      "Girl Removing Bra": "strip_bra",
+      "Girl Removing Lower": "strip_lower",
+      "Girl Removing Panties": "strip_panties",
+      "Girl Removing Socks": "strip_socks",
+      "Girl Removing Shoes": "strip_shoes"
+    },
+    "Girl Self-Removing Specific": {
+      "Girl Removing Dress": "strip_dress",
+      "Girl Removing Leotard/Onepiece": "strip_onepiece",
+      "Girl Removing Shirt": "strip_shirt",
+      "Girl Removing Jeans": "strip_jeans",
+      "Girl Removing Leggings": "strip_leggings",
+      "Girl Removing Skirt": "strip_skirt",
+      "Girl Removing Shorts": "strip_shorts",
+      "Girl Removing Stockings": "strip_stockings",
+      "Girl Removing Pantyhose": "strip_pantyhose"
+    },
+    "Player Tearing Clothing": {
+      "Player Tear Outer": "tear_outer",
+      "Player Tear Upper": "tear_upper",
+      "Player Tear Bra": "tear_bra",
+      "Player Tear Lower": "tear_lower",
+      "Player Tear Panties": "tear_panties",
+      "Player Tear Socks": "tear_socks"
+    },
+    "Player Tearing Specific": {
+      "Player Tear Dress": "tear_dress",
+      "Player Tear Leotard/Onepiece": "tear_onepiece",
+      "Player Tear Shirt": "tear_shirt",
+      "Player Tear Jeans": "tear_jeans",
+      "Player Tear Leggings": "tear_leggings",
+      "Player Tear Skirt": "tear_skirt",
+      "Player Tear Shorts": "tear_shorts",
+      "Player Tear Stockings": "tear_stockings",
+      "Player Tear Pantyhose": "tear_pantyhose"
+    }
+  },
+  "clothing_tags": {
+    "Generic Tags": {
+      "Naked/Bare": "bare",
+      "Clothed": "clothed",
+      "Wearing Lower/Bot": "bot",
+      "Bottomless/No Bot": "nobot",
+      "Wearing Top": "top",
+      "Topless/No Top": "notop",
+      "Wearing Bra": "bra",
+      "Braless": "nobra",
+      "Wearing Panties": "panty",
+      "Pantyless": "nopanty",
+      "Wearing Buttplug": "buttplug",
+      "Lingerie": "lingerie"
+    },
+    "Outer Tags": {
+      "Hoodie": "hoodie",
+      "Jacket": "jacket"
+    },
+    "Upper Tags": {
+      "Corset": "corset",
+      "Dress": "dress",
+      "Leotard/Onepiece": "onepiece",
+      "Shirt": "shirt",
+      "Transparent Dress": "transparent_dress",
+      "Transparent Upper": "transparent_upper",
+      "Cheer Top(Modded)": "cheerleader_top"
+    },
+    "Lower Tags": {
+      "Jeans": "jeans",
+      "Leggings": "leggings",
+      "Shorts": "shorts",
+      "Skirt": "skirt",
+      "Cheer Skirt(Modded)": "cheerleader_skirt"
+    },
+    "Panty Tags": {
+      "Transparent Panties": "transparent_panty"
+    },
+    "Legs Tags": {
+      "Fishnet": "fishnet",
+      "Pantyhose": "pantyhose",
+      "Stockings": "stockings"
+    },
+    "Ignore Tags": {
+      "Ignore Bra": "br_i",
+      "Ignore Buttplug": "bu_i",
+      "Ignore Lower": "lo_i",
+      "Ignore Outer": "ou_i",
+      "Ignore Panties": "pa_i",
+      "Ignore Shoes": "sh_i",
+      "Ignore Socks": "so_i",
+      "Ignore Upper": "up_i"
+    }
+  },
+  "corruption_level": {
+    "Conservative": "conservative",
+    "Slut": "slut",
+    "Whore": "whore",
+    "Ultimate Whore": "u_whore"
+  },
+  "participants": {
+    "Solo Male": "solo_male",
+    "FFM Threesome": "tp_fem",
+    "MMF Threesome": "tp_male"
+  },
+  "thirdparty_tags": {
+    "Dildo": "dildo",
+    "Vibrator": "vibrator"
+  }
+}

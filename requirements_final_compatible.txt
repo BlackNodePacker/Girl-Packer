@@ -1,0 +1,34 @@
+# requirements_final_compatible.txt
+# إصدارات متوافقة 100% مع Python 3.11
+
+# الأساسيات - إصدارات مثبتة ومتوافقة
+numpy==1.24.3
+opencv-python==4.8.1.78
+Pillow==10.0.1
+
+# الذكاء الاصطناعي - إصدارات متوافقة
+torch==2.0.1
+torchvision==0.15.2
+ultralytics==8.0.186
+scikit-learn==1.3.0
+
+# واجهة المستخدم
+PySide6==6.6.1
+qtawesome==1.3.1
+
+# الأدوات المساعدة - إصدارات متوافقة مع Python 3.11
+scenedetect==0.6.7.1  # أحدث إصدار متوافق
+transparent-background==1.3.2
+imagehash==4.3.1
+pyyaml==6.0.1
+loguru==0.7.2
+requests==2.31.0
+
+# حزم التوافق
+protobuf==3.20.3
+typing-extensions==4.8.0
+filelock==3.13.1
+Jinja2==3.1.2
+MarkupSafe==2.1.3
+
+# python-vlc - سنتعامل معه بشكل منفصل

@@ -1,0 +1,39 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+.venv/
+env/
+venv/
+ENV/
+
+# IDEs and editors
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Media / temporary files
+*.tmp
+*.bak
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+
+# Sensitive files
+*.env
+*.key
+*.pem

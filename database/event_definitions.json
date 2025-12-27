@@ -1,0 +1,28 @@
+{
+    "nuru_massage": {
+        "name": "nuru_massage",
+        "display_name": "shared massage",
+        "requirements": "girl.corruption>40",
+        "requirement_description": "Requires corruption >40",
+        "event_type": [
+            "home"
+        ],
+        "stages": [
+            "o"
+        ],
+        "participant_ids": [
+            "Blake_blossom",
+            "selected_girl"
+        ],
+        "min_chance_to_happen": 25.0,
+        "max_chance_to_happen": 40.0,
+        "event_cooldown": 7,
+        "same_participant_cooldown": 2,
+        "one_time_event": true,
+        "reset_outfit_when_finished": true,
+        "hide_in_menus": true,
+        "ignore_frequency": false,
+        "allow_random_trigger": false,
+        "script": {}
+    }
+}

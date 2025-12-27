@@ -1,0 +1,146 @@
+/* GameMediaTool/gui/style.qss - NEW Dark Blue Theme */
+
+/* --- General Styles --- */
+QWidget {
+    background-color: #1e1e1e; /* Darker Background */
+    color: #cccccc; /* Light Grey Text */
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+QMainWindow {
+    background-color: #1e1e1e;
+}
+
+/* --- Labels and Text --- */
+QLabel {
+    color: #cccccc;
+}
+QLabel#TitleLabel {
+    font-size: 24px;
+    font-weight: bold;
+    color: #007acc; /* Accent Blue */
+}
+QLineEdit, QTextEdit {
+    background-color: #2d2d2d; /* Mid Dark Grey */
+    color: #cccccc;
+    border: 1px solid #3c3c3c; /* Lighter Border */
+    padding: 8px;
+    border-radius: 5px;
+}
+
+/* --- Group Boxes --- */
+QGroupBox {
+    border: 1px solid #007acc; /* Accent Blue Border */
+    border-radius: 8px;
+    margin-top: 1ex;
+    font-weight: bold;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top center;
+    padding: 0 10px;
+    color: #007acc; /* Accent Blue */
+}
+
+/* --- Buttons --- */
+QPushButton {
+    background-color: #007acc; /* Accent Blue */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-weight: bold;
+    min-height: 20px;
+}
+QPushButton:hover {
+    background-color: #0095ff; /* Lighter Blue */
+}
+QPushButton:disabled {
+    background-color: #3c3c3c;
+    color: #6a6a6a;
+}
+QPushButton#ConfirmButton { background-color: #1a8a3c; } /* Green */
+QPushButton#ConfirmButton:hover { background-color: #2a9a4c; }
+QPushButton#AddButton { background-color: #0dcaf0; } /* Cyan */
+QPushButton#AddButton:hover { background-color: #31d2f2; }
+QPushButton#MagicButton { background-color: #ffc107; color: #1e1e1e; } /* Orange */
+QPushButton#MagicButton:hover { background-color: #ffca2c; }
+QPushButton#DeleteButton { background-color: #dc3545; font-size: 12px; max-width: 25px; padding: 5px; } /* Kept Red for Delete */
+QPushButton#DeleteButton:hover { background-color: #bb2d3b; }
+
+/* --- Other Controls --- */
+QRadioButton::indicator { border: 2px solid #007acc; border-radius: 8px; }
+QRadioButton::indicator:checked { background-color: #007acc; border: 2px solid white; }
+QSlider::handle:horizontal { background: #007acc; border: 1px solid #007acc; }
+QProgressBar { border: 1px solid #007acc; text-align: center; color: #cccccc;}
+QProgressBar::chunk { background-color: #007acc; }
+QListWidget { background-color: #2d2d2d; border: 1px solid #3c3c3c; border-radius: 5px; color: #cccccc;}
+QComboBox {
+    background-color: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    padding: 5px;
+    border-radius: 3px;
+    color: #cccccc;
+}
+QComboBox QAbstractItemView {
+    background-color: #2d2d2d;
+    color: #cccccc;
+    selection-background-color: #007acc; /* Blue highlight */
+}
+QComboBox::drop-down { border: none; }
+QSpinBox, QDoubleSpinBox {
+    background-color: #2d2d2d;
+    color: #cccccc;
+    border: 1px solid #3c3c3c;
+    padding: 5px;
+    border-radius: 3px;
+}
+QCheckBox { color: #cccccc; }
+QCheckBox::indicator { border: 1px solid #3c3c3c; border-radius: 3px; background-color: #2d2d2d;}
+QCheckBox::indicator:checked { background-color: #007acc; border: 1px solid #007acc;}
+
+/* --- Table Styles --- */
+QTableWidget {
+    background-color: #2d2d2d;
+    border: 1px solid #3c3c3c;
+    gridline-color: #3c3c3c;
+    color: #cccccc; /* Ensure table text is readable */
+}
+QHeaderView::section {
+    background-color: #3c3c3c; /* Header background */
+    color: #cccccc; /* Header text */
+    padding: 4px;
+    border: 1px solid #2d2d2d;
+    font-weight: bold;
+}
+
+/* --- Tab Widget Styles --- */
+QTabWidget::pane {
+    border: 1px solid #007acc; /* Blue border for the pane */
+    border-top: none;
+    border-radius: 0px 0px 5px 5px;
+}
+QTabBar::tab {
+    background-color: #2d2d2d; /* Dark Grey for inactive tabs */
+    color: #aaaaaa; /* Lighter grey for inactive text */
+    padding: 10px 20px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid #3c3c3c;
+    border-bottom: none;
+    margin-right: 2px;
+}
+QTabBar::tab:hover {
+    background-color: #3c3c3c; /* Lighter gray on hover */
+}
+QTabBar::tab:selected {
+    background-color: #007acc; /* Blue for the selected tab */
+    color: white;
+    font-weight: bold;
+    border: 1px solid #007acc;
+    border-bottom: 1px solid #007acc; /* Make selected tab blend */
+}
+QTabBar::tab:disabled {
+    background-color: #1e1e1e; /* Darkest background for disabled */
+    color: #3c3c3c;
+}

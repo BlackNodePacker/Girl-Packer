@@ -1,0 +1,19 @@
+{
+    "face": {
+        "Face": "face"
+    },
+    "portrait": {
+        "Clothed Portrait": "portrait",
+        "Topless Portrait": "tportrait"
+    },
+    "upper_body": {
+        "Boobs": "boobs"
+    },
+    "lower_body": {
+        "Pussy": "pussy",
+        "Ass": "ass"
+    },
+    "limbs": {
+        "Legs": "legs"
+    }
+}

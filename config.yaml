@@ -1,0 +1,85 @@
+# --- Path Configurations ---
+paths:
+  temp_dir: "temp"
+  output_dir: "output"
+  assets_dir: "assets"
+  models_dir: "ai/models"
+
+# --- Video Processing Configurations ---
+video:
+  splitter:
+    default_segment_duration: 10
+  exporter:
+    bitrate: "4000k"
+    resolution_height: 720
+    fps: 24
+
+# --- Image Processing Configurations ---
+image:
+  webp_quality: 90
+  
+  # Interval in seconds for frame sampling
+  interval_seconds: 1
+  # Lower value = more frames (less strict). Higher value = fewer frames (higher quality).
+  blur_threshold: 40.0
+
+  target_sizes:
+    face: [500, 500]
+    portrait: [350, 350]
+    tportrait: [350, 350]
+    
+    # تاجات أجزاء الجسم الأساسية
+    boobs: [495, 240]
+    pussy: [245, 235]
+    ass: [495, 240]
+    legs: [245, 235]
+    
+    # [الإصلاح: تاجات الملابس التي يرسلها الكود - لها نفس المقاسات]
+    # يتم استخدام هذه التاجات بواسطة Worker للبحث عن الأبعاد
+    boobs_cover_item: [495, 240]    # نفس مقاس boobs
+    pussy_cover_item: [245, 235]    # نفس مقاس pussy
+    ass_cover_item: [495, 240]      # نفس مقاس ass
+    leg_cover_item: [245, 235]      # نفس مقاس legs
+    
+    accessory_footwear: [245, 235]  # نفس مقاس leg/pussy (كما طلبت)
+
+    # تاجات Fullbody
+    fullbody_nude: [1000, 1500]
+    fullbody_clothed: [1000, 1500]
+    fullbody_costume: [1000, 1500]
+    fullbody: [1000, 1500] # احتياطي
+    
+  # [MODIFIED] List of asset "tag_values" that should have their background removed.
+  # تم إضافة 'fullbody' كتاج احتياطي
+  transparent_targets:
+    - portrait
+    - tportrait
+    - fullbody_bare        # بدلاً من fullbody_nude
+    - fullbody_topless     # (إذا كنت تسمح بالملابس الداخلية، يجب إضافتها)
+    - fullbody_bottomless  # بناءً على ملف JSON Nude_states
+    - fullbody_shower      # بناءً على ملف JSON Nude_states
+    - fullbody_clothed     # (إذا كنت تسمح بالـ Clothed)
+    - fullbody_underwear   # (إذا كنت تسمح بالـ Underwear)
+    - fullbody_bikini      # (إذا كنت تسمح بالـ Bikini)
+    - fullbody_costume     # (للتصنيفات الأخرى في costume_states)
+    - fullbody # لضمان إزالة الخلفية إذا لم يتم تحديد النوع (احتياطي)
+    
+  # Dimensions for final cropped clothing items.
+  # تم إزالة المقاسات المكررة التي يجب أن تستخدم target_sizes (مثل bra, panty, skirt...)
+  clothing_dimensions:
+    special: [495, 240]
+    
+# --- AI Model Configurations ---
+ai:
+  yolo:
+    weights_path: "ai/models/best.pt"
+    confidence_threshold: 0.25
+  cnn:
+    input_shape: [224, 224, 3]
+    asset_model_path: "ai/models/asset_classifier.pth"
+    action_model_path: "ai/models/action_classifier.pth"
+
+# --- AI Training Workflow Configurations ---
+training:
+  cnn_data_dir: "assets/cnn_training_data"
+  max_pool_size: 1000
