@@ -23,6 +23,7 @@ imagehash==4.3.1
 pyyaml==6.0.1
 loguru==0.7.2
 requests==2.31.0
+faster-whisper==1.0.3
 
 # حزم التوافق
 protobuf==3.20.3

@@ -93,7 +93,20 @@ def get_ffmpeg_split_commands(video_path, output_folder, clips):
     if not os.path.exists(FFMPEG_PATH):
         logger.error(f"FFmpeg not found at: {FFMPEG_PATH}.")
         return []
+    if not os.path.exists(video_path):
+        logger.error(f"Video file not found: {video_path}")
+        return []
 
+    # Validate video file can be read
+    try:
+        duration = get_video_duration(video_path)
+        if duration <= 0:
+            logger.error(f"Invalid video file or unable to read duration: {video_path}")
+            return []
+        logger.info(f"Video duration: {duration} seconds")
+    except Exception as e:
+        logger.error(f"Error validating video file {video_path}: {e}")
+        return []
     os.makedirs(output_folder, exist_ok=True)
     video_path_obj = Path(video_path)
     base_name = video_path_obj.stem

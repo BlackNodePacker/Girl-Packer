@@ -1,0 +1,16 @@
+# Development and build requirements
+# Install with: pip install -r requirements-dev.txt
+
+# Build tools
+nuitka
+pyinstaller
+
+# Development tools
+pytest
+flake8
+black
+mypy
+
+# Testing
+pytest-cov
+pytest-qt

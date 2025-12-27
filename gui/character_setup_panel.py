@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QFileDialog,
     QMessageBox,
     QDialog,
+    QDoubleSpinBox,
 )  # <-- [THE FIX] QDialog added
 from PySide6.QtCore import Qt, Signal, QDir
 
@@ -42,6 +43,12 @@ class CharacterSetupPanel(QWidget):
         self.last_input_path = self.settings.value("last_input_path", QDir.homePath())
         self.trait_checkboxes = {}
         self.custom_traits_data = []
+        self.body_part_ratios = {
+            "boobs": 1.00,
+            "ass": 1.00,
+            "pussy": 1.00,
+            "legs": 1.00,
+        }
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         container = QWidget()
@@ -92,6 +99,26 @@ class CharacterSetupPanel(QWidget):
         options_layout.addWidget(self.create_char_config_checkbox)
         options_layout.addWidget(self.add_custom_trait_button)
         layout.addWidget(options_group)
+        
+        # Body Part Ratios Box
+        ratios_group = QGroupBox("Body Part Ratios")
+        ratios_layout = QVBoxLayout(ratios_group)
+        self.ratio_spinboxes = {}
+        for part in ["boobs", "ass", "pussy", "legs"]:
+            hbox = QHBoxLayout()
+            label = QLabel(part.capitalize() + ":")
+            spinbox = QDoubleSpinBox()
+            spinbox.setRange(0.1, 5.0)
+            spinbox.setSingleStep(0.1)
+            spinbox.setValue(self.body_part_ratios[part])
+            spinbox.setFixedWidth(80)
+            self.ratio_spinboxes[part] = spinbox
+            hbox.addWidget(label)
+            hbox.addWidget(spinbox)
+            hbox.addStretch()
+            ratios_layout.addLayout(hbox)
+        layout.addWidget(ratios_group)
+        
         layout.addStretch()
         return layout
 
@@ -150,12 +177,19 @@ class CharacterSetupPanel(QWidget):
         custom_layout.addLayout(buttons_vbox)
         return custom_group
 
+    def _update_ratio(self, part, value):
+        self.body_part_ratios[part] = value
+        logger.debug(f"Updated {part} ratio to {value}")
+
     def _connect_signals(self):
         self.create_char_config_checkbox.toggled.connect(self.details_group.setVisible)
         self.select_video_button.clicked.connect(self._select_video)
         self.select_folder_button.clicked.connect(self._select_image_folder)
         self.start_button.clicked.connect(self._start_project)
         self.add_custom_trait_button.clicked.connect(self._open_add_trait_dialog)
+        # Connect ratio spinboxes
+        for part, spinbox in self.ratio_spinboxes.items():
+            spinbox.valueChanged.connect(lambda value, p=part: self._update_ratio(p, value))
 
     def _refresh_custom_traits_list(self):
         self.custom_traits_list.clear()
@@ -214,6 +248,7 @@ class CharacterSetupPanel(QWidget):
                 tag for tag, cb in self.trait_checkboxes.items() if cb.isChecked()
             ]
             char_details["custom_traits"] = self.custom_traits_data
+            char_details["body_part_ratios"] = self.body_part_ratios
         self.project.character_details = char_details
         logger.info(f"Starting project '{self.project.character_name}'.")
         self.project_started.emit()

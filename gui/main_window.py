@@ -40,11 +40,16 @@ logger = get_logger("MainWindow")
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+        logger.info("Initializing MainWindow")
         self.config = load_config()
+        logger.debug(f"Config loaded: {self.config}")
         self.settings = QSettings("GameMediaTool", "GirlPacker")
         self.project = Project()
+        logger.info("Project instance created")
         self.tag_manager = TagManager()
+        logger.info("TagManager initialized")
         self.pipeline = Pipeline(self.tag_manager)
+        logger.info("AI Pipeline initialized")
 
         self.photo_maker_workflow = PhotoMakerWorkflow(self)
         self.vid_maker_workflow = VidMakerWorkflow(self)
@@ -64,8 +69,10 @@ class MainWindow(QMainWindow):
         Called by EventMakerPanel to list available media files.
         FIX: Now calls the corrected method in self.project.
         """
-        # نستخدم الدالة الجديدة التي أضفناها لكائن Project
-        return self.project.get_asset_file_paths()
+        logger.debug("Retrieving asset file paths")
+        paths = self.project.get_asset_file_paths()
+        logger.info(f"Found {len(paths)} asset file paths")
+        return paths
 
     # [FIXED INDENTATION]
     def get_all_traits(self):
@@ -73,8 +80,10 @@ class MainWindow(QMainWindow):
         Returns a list of all available traits from the TagManager.
         Used by EventMakerPanel to populate trait comboboxes.
         """
-        # نستخدم TagManager مباشرة
-        return self.tag_manager.get_all_traits()
+        logger.debug("Retrieving all traits")
+        traits = self.tag_manager.get_all_traits()
+        logger.info(f"Retrieved {len(traits)} trait categories")
+        return traits
 
     # [FIXED INDENTATION]
     def save_event_files(self, event_name, event_data_json, rpy_content):
@@ -82,11 +91,14 @@ class MainWindow(QMainWindow):
         Saves the event configuration JSON and the Ren'Py script to the project directory.
         Used by EventMakerPanel when the user clicks 'Save Event'.
         """
+        logger.info(f"Saving event files for event: {event_name}")
         # نستخدم TagManager لحفظ الـ JSON
         self.tag_manager.save_event_definition(event_name, event_data_json)
+        logger.debug("Event JSON saved via TagManager")
         # نستخدم Project لحفظ ملف Ren'Py Script
-        self.project.save_event(event_name, event_data_json, rpy_content)
-        # Note: self.project.save_event must be implemented in the Project class
+        self.project.save_event_files(event_name, event_data_json, rpy_content)
+        logger.info("Event RPY script saved successfully")
+        # Note: self.project.save_event_files must be implemented in the Project class
 
     # **********************************************
     # * END OF NEW METHODS *
@@ -424,3 +436,28 @@ class MainWindow(QMainWindow):
             self, "Shoot Saved", f"Shoot '{shoot_data['config']['display_name']}' has been saved."
         )
         self.go_to_dashboard()  # <-- تم التصحيح هنا
+
+    def show_processing_screen(self):
+        """
+        Shows a progress dialog for final processing operations.
+        Called when image workshop starts final processing.
+        """
+        logger.info("Showing processing screen for final processing")
+        self.progress_dialog = QProgressDialog("Processing final images...", "Cancel", 0, 100, self)
+        self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self.progress_dialog.show()
+        # Connect to workflow progress if available
+        if hasattr(self.photo_maker_workflow, 'progress_updated'):
+            self.photo_maker_workflow.progress_updated.connect(self.progress_dialog.setValue)
+        if hasattr(self.photo_maker_workflow, 'stop_current_task'):
+            self.progress_dialog.canceled.connect(self.photo_maker_workflow.stop_current_task)
+        # Connect to close dialog when finished
+        self.photo_maker_workflow.final_processing_finished.connect(self._close_processing_dialog)
+
+    def _close_processing_dialog(self, *args):
+        """
+        Closes the processing progress dialog when final processing finishes.
+        """
+        if hasattr(self, 'progress_dialog') and self.progress_dialog.isVisible():
+            self.progress_dialog.close()
+            logger.info("Processing dialog closed")

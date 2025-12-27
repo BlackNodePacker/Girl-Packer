@@ -17,7 +17,7 @@ def temp_project():
     """Create a temporary project."""
     project = Project()
     project.character_name = "TestChar"
-    project.source_video_path = r"F:\My Tools\Girl Packer\sample\720.mp4"
+    project.input_video_path = r"F:\My Tools\Girl Packer\sample\720.mp4"
     project.source_type = "video"
     with tempfile.TemporaryDirectory() as tmpdir:
         project.final_output_path = tmpdir

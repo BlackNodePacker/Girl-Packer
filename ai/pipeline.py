@@ -78,24 +78,32 @@ class Pipeline:
 
     def classify_asset(self, image: np.ndarray) -> str:
         if self.asset_classifier is None:
+            logger.warning("Asset classifier not loaded")
             return "unknown_asset"
 
+        logger.debug("Classifying asset")
         with torch.no_grad():
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             tensor = self.transform(image_rgb).unsqueeze(0).to(self.device)
             outputs = self.asset_classifier(tensor)
             _, predicted = torch.max(outputs, 1)
             class_idx = predicted.item()
-            return self.asset_class_map.get(class_idx, "unknown_asset")
+            tag = self.asset_class_map.get(class_idx, "unknown_asset")
+            logger.debug(f"Asset classified as: {tag}")
+            return tag
 
     def suggest_action(self, image: np.ndarray) -> str:
         if self.action_classifier is None:
+            logger.warning("Action classifier not loaded")
             return "unknown_action"
 
+        logger.debug("Suggesting action")
         with torch.no_grad():
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             tensor = self.transform(image_rgb).unsqueeze(0).to(self.device)
             outputs = self.action_classifier(tensor)
             _, predicted = torch.max(outputs, 1)
             class_idx = predicted.item()
-            return self.action_class_map.get(class_idx, "unknown_action")
+            tag = self.action_class_map.get(class_idx, "unknown_action")
+            logger.debug(f"Action suggested: {tag}")
+            return tag

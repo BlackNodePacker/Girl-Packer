@@ -35,6 +35,8 @@ dist/
 build/
 *.exe
 *.spec
+*.nuitka
+*.manifest
 
 # Test files
 .pytest_cache/

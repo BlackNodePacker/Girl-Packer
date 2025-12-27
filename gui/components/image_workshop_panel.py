@@ -456,7 +456,7 @@ class ImageWorkshopPanel(QWidget):
         self.prev_frame_button.setEnabled(self.current_frame_index > 0)
         self.next_frame_button.setEnabled(self.current_frame_index < len(self.frame_paths) - 1)
 
-        detections = self.yolo_results_cache.get(self.current_frame_path, [])
+        detections = self.yolo_results_cache.get(self.current_frame_path, {}).get('detections', [])
         self.image_viewer.clear_boxes()
 
         for det in detections:
@@ -853,4 +853,7 @@ class ImageWorkshopPanel(QWidget):
 
         # إرسال البيانات بالصيغة الصحيحة
         self.processing_requested.emit(final_payload)
-        self.main_window.show_processing_screen()
+        if hasattr(self.main_window, 'show_processing_screen'):
+            self.main_window.show_processing_screen()
+        else:
+            logger.warning("show_processing_screen method not found in MainWindow")

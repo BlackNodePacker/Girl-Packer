@@ -46,7 +46,7 @@ class TagManager:
         return {}
 
     # --- [NEW/MODIFIED] Method to add and save event data ---
-    def add_event_definition(self, event_name, event_data):
+    def save_event_definition(self, event_name, event_data):
         """Adds an event definition to memory and saves the entire event_definitions.json file."""
         try:
             if not event_name:

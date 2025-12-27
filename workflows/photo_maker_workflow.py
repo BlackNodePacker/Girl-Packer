@@ -23,8 +23,10 @@ class PhotoMakerWorkflow(QObject):
         self.pipeline = main_window.pipeline
         self.thread = None
         self.worker = None
+        logger.info("PhotoMakerWorkflow initialized")
 
     def start_workflow(self, source_type: str, settings: dict = None):
+        logger.info(f"Starting PhotoMaker workflow with source_type: {source_type}, settings: {settings}")
         if source_type in ["video", "clips"]:
             source_paths = (
                 self.project.export_data.get("all_created_clips", [])
@@ -32,6 +34,7 @@ class PhotoMakerWorkflow(QObject):
                 else [self.project.source_video_path]
             )
             if not source_paths:
+                logger.warning("No source paths found, emitting empty extraction finished")
                 self.extraction_finished.emit([])
                 return
 
@@ -41,9 +44,11 @@ class PhotoMakerWorkflow(QObject):
                 logger.warning(f"Cleaning previous extraction results from: {output_folder}")
                 shutil.rmtree(output_folder)
             ensure_folder(output_folder)
+            logger.debug(f"Output folder prepared: {output_folder}")
 
             self._run_frame_extraction(source_paths, settings, output_folder)
         elif source_type == "folder":
+            logger.info("Emitting source image paths for folder source")
             self.extraction_finished.emit(self.project.source_image_paths)
 
     def _run_frame_extraction(self, video_paths: list, settings: dict, output_folder: str):
@@ -54,6 +59,7 @@ class PhotoMakerWorkflow(QObject):
         logger.info(
             f"Starting frame extraction with blur threshold: {blur_thresh} and interval: {interval}s"
         )
+        logger.debug(f"Video paths: {video_paths}, output: {output_folder}")
 
         worker = FrameExtractorWorker(
             video_paths, output_folder, blur_threshold=blur_thresh, interval_seconds=interval
@@ -61,6 +67,7 @@ class PhotoMakerWorkflow(QObject):
         self._run_worker(worker, self.extraction_finished)
 
     def run_yolo_analysis(self, selected_paths: list):
+        logger.info(f"Starting YOLO analysis on {len(selected_paths)} paths")
         tasks = {"body_assets", "clothing_assets"}
         worker = YOLOWorker(self.pipeline, selected_paths)
         worker.finished.connect(
@@ -69,6 +76,7 @@ class PhotoMakerWorkflow(QObject):
         self._run_worker(worker, None)
 
     def run_final_processing(self, instructions: dict):
+        logger.info(f"Starting final processing with instructions: {list(instructions.keys())}")
         worker = FinalProcessorWorker(self.main_window, instructions)
         self._run_worker(worker, self.final_processing_finished)
 
@@ -93,10 +101,14 @@ class PhotoMakerWorkflow(QObject):
 
     def stop_current_task(self):
         if self.worker and hasattr(self.worker, "stop"):
+            logger.info("Stopping current worker task")
             self.worker.stop()
+        else:
+            logger.debug("No worker to stop or no stop method")
 
     def _get_temp_folder(self, subfolder_name: str) -> str:
         char_name_safe = sanitize_filename(self.project.character_name)
         temp_folder = os.path.join("temp", char_name_safe, subfolder_name)
         ensure_folder(temp_folder)
+        logger.debug(f"Temp folder ensured: {temp_folder}")
         return temp_folder

@@ -3,10 +3,12 @@
 import os, sys, shutil, json, subprocess
 from typing import Dict, Any, List
 from PIL import Image
+import cv2
 from tools.logger import get_logger
 import re
 from tools.rpy_generator import generate_custom_traits_rpy, generate_event_rpy
 from utils.file_ops import ensure_folder, sanitize_filename
+from tools.background_remover import remove_background
 
 logger = get_logger("MediaExporter")
 # يجب تعديل مسار FFMPEG ليتناسب مع بيئتك (F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe)
@@ -261,6 +263,24 @@ def _export_assets(approved_images: List[Dict[str, Any]], pack_root: str):
                 continue
 
         if dest_path:
+            # Apply background removal for specific tags just before exporting
+            base_type = asset.get("base_type", "")
+            asset_category = asset.get("asset_category", "")
+            if base_type in ["face", "portrait", "tportrait"] or asset_category == "fullbody":
+                try:
+                    # Load image
+                    img = cv2.imread(src, cv2.IMREAD_UNCHANGED)
+                    if img is not None:
+                        # Apply background removal
+                        img_with_alpha = remove_background(img)
+                        # Save to temp path with alpha
+                        temp_path = src.replace('.png', '_bg_removed.png')
+                        cv2.imwrite(temp_path, img_with_alpha)
+                        src = temp_path  # Use the modified image for export
+                        logger.info(f"  - Applied background removal to: {os.path.basename(src)}")
+                except Exception as e:
+                    logger.error(f"Failed to apply background removal to {src}: {e}")
+
             # نستخدم _copy_and_convert_to_webp التي تتأكد من أن dest_path ينتهي بـ .webp
             if _copy_and_convert_to_webp(src, dest_path):
                 logger.info(f"  - Exported asset: {os.path.basename(dest_path)}")

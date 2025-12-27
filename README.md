@@ -30,6 +30,11 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
    pip install -r requirements_final_compatible.txt
    ```
 
+4. (Optional) Install development tools:
+   ```bash
+   pip install -r requirements-dev.txt
+   ```
+
 4. Run the application:
    ```bash
    python main.py
@@ -88,12 +93,62 @@ Edit `config.yaml` for:
 
 ## Build
 
-To build a standalone executable with Nuitka:
+### Prerequisites
+- Python 3.11
+- Nuitka or PyInstaller (for packaging)
+
+### Development Setup
 ```bash
-nuitka --onefile --enable-plugin=pyside6 --include-data-dir=gui=gui --include-data-dir=ai/models=ai/models main.py
+# Install in development mode
+pip install -e .
 ```
 
-Include FFmpeg binaries in the build.
+### Building Standalone Executable
+
+#### Option 1: Nuitka (Recommended)
+```bash
+# Install Nuitka
+pip install nuitka
+
+# Build executable
+python build_nuitka.py
+# or
+build.bat nuitka
+```
+
+#### Option 2: PyInstaller
+```bash
+# Install PyInstaller
+pip install pyinstaller
+
+# Build executable
+python build_pyinstaller.py
+# or
+build.bat pyinstaller
+```
+
+#### Option 3: Manual Nuitka
+```bash
+nuitka --standalone --onefile --enable-plugin=pyside6 --enable-plugin=torch \
+       --include-data-dir=assets=assets --include-data-dir=database=database \
+       --include-data-file=gui/style.qss=style.qss \
+       --include-data-file=ffmpeg.exe=ffmpeg.exe \
+       --include-data-file=ffprobe.exe=ffprobe.exe \
+       --include-data-file=config.yaml=config.yaml \
+       --include-data-dir=ai/models=ai/models \
+       --windows-disable-console \
+       main.py
+```
+
+### Build Artifacts
+- Executable: `dist/GirlPacker.exe`
+- Build files: `build/` directory
+- Distribution: `dist/` directory
+
+### Cleaning Build
+```bash
+build.bat clean
+```
 
 ## Dependencies
 

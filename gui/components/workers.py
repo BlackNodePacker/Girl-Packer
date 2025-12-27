@@ -4,7 +4,7 @@ import os
 import shutil
 import cv2
 from pathlib import Path
-from PySide6.QtCore import QObject, Signal, QProcess
+from PySide6.QtCore import QObject, Signal, QProcess, QProcessEnvironment, QTimer
 
 from tools.frame_extractor import extract_frames
 from tools.video_splitter import get_ffmpeg_split_commands
@@ -75,6 +75,8 @@ class YOLOWorker(QObject):
         self.is_running = True
 
     def run(self):
+        import cv2
+        import os
         yolo_results = {}
         total_frames = len(self.frame_paths)
         if total_frames == 0:
@@ -98,9 +100,27 @@ class YOLOWorker(QObject):
             try:
                 # التأكد من استخدام يولو مودل انستانس وليس البايبلاين كله
                 detections = detect_objects(frame_path, yolo_model_instance, conf_threshold=0.10)
-                yolo_results[frame_path] = detections
+                
+                # Save YOLO label file
+                image = cv2.imread(frame_path)
+                if image is not None:
+                    h, w = image.shape[:2]
+                    label_path = os.path.splitext(frame_path)[0] + '.txt'
+                    with open(label_path, 'w') as f:
+                        for det in detections:
+                            x1, y1, x2, y2 = det['bbox']
+                            x_center = (x1 + x2) / 2 / w
+                            y_center = (y1 + y2) / 2 / h
+                            width = (x2 - x1) / w
+                            height = (y2 - y1) / h
+                            class_id = 0  # Assume class 0 for detection
+                            f.write(f"{class_id} {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}\n")
+                    yolo_results[frame_path] = {'detections': detections, 'label_path': label_path}
+                else:
+                    yolo_results[frame_path] = {'detections': detections, 'label_path': None}
             except Exception as e:
                 logger.error(f"Error during YOLO detection for {frame_path}: {e}", exc_info=True)
+                yolo_results[frame_path] = {'detections': [], 'label_path': None}
 
             progress_percent = int((i + 1) / total_frames * 100)
             self.progress.emit(progress_percent)
@@ -261,6 +281,11 @@ class FinalProcessorWorker(QObject):
                         "yolo_detection": yolo_detection,
                     }
 
+                    # Add YOLO label path if exists
+                    label_path = os.path.splitext(frame_path)[0] + '.txt'
+                    if os.path.exists(label_path):
+                        asset_to_export["yolo_label_path"] = label_path
+
                     # [NEW FIX] إضافة مكونات مسار الملابس لتمريرها إلى media_exporter.py
                     if asset_category == "clothing":
                         # نعتمد على وجود هذه المفاتيح في item_data التي جاءت من واجهة المستخدم
@@ -322,6 +347,9 @@ class VideoSplitterWorker(QObject):
         self.current_clip_index = 0
         self.total_clips = 0
         self._is_running = True
+        self.timeout_timer = QTimer(self)
+        self.timeout_timer.setSingleShot(True)
+        self.timeout_timer.timeout.connect(self._on_process_timeout)
 
     def run(self):
         self.created_files = {}
@@ -342,14 +370,87 @@ class VideoSplitterWorker(QObject):
         command, output_path = self.commands_to_run[self.current_clip_index]
         executable = command[0]
         args = command[1:]
+
+        logger.info(f"Starting FFmpeg command {self.current_clip_index + 1}/{self.total_clips}: {executable} {' '.join(args)}")
+
         self.process = QProcess(self)
         self.process.finished.connect(self._on_process_finished)
+        self.process.errorOccurred.connect(self._on_process_error)
+        self.process.readyReadStandardError.connect(self._on_process_stderr)
+        self.process.readyReadStandardOutput.connect(self._on_process_stdout)
+
+        # Set process environment and working directory
+        env = QProcessEnvironment.systemEnvironment()
+        self.process.setProcessEnvironment(env)
+        self.process.setWorkingDirectory(os.path.dirname(executable))
+
         self.process.start(executable, args)
 
+        # Check if process started
+        if not self.process.waitForStarted(5000):  # 5 second timeout
+            logger.error(f"Failed to start FFmpeg process for clip {self.current_clip_index + 1}")
+            self._handle_process_failure()
+            return
+
+        logger.info(f"FFmpeg process started for clip {self.current_clip_index + 1}")
+
+        # Start timeout timer (5 minutes per clip should be more than enough)
+        self.timeout_timer.start(300000)  # 5 minutes
+
+    def _on_process_error(self, error):
+        # Stop the timeout timer
+        self.timeout_timer.stop()
+
+        error_msg = {
+            QProcess.ProcessError.FailedToStart: "Failed to start",
+            QProcess.ProcessError.Crashed: "Crashed",
+            QProcess.ProcessError.Timedout: "Timed out",
+            QProcess.ProcessError.WriteError: "Write error",
+            QProcess.ProcessError.ReadError: "Read error",
+            QProcess.ProcessError.UnknownError: "Unknown error"
+        }.get(error, "Unknown error")
+
+        logger.error(f"QProcess error for clip {self.current_clip_index + 1}: {error_msg}")
+        self._handle_process_failure()
+
+    def _on_process_stdout(self):
+        stdout = self.process.readAllStandardOutput().data().decode("utf-8", "ignore")
+        if stdout.strip():
+            logger.debug(f"FFmpeg stdout: {stdout.strip()}")
+
+    def _on_process_stderr(self):
+        stderr = self.process.readAllStandardError().data().decode("utf-8", "ignore")
+        if stderr.strip():
+            logger.debug(f"FFmpeg stderr: {stderr.strip()}")
+
+    def _on_process_timeout(self):
+        logger.error(f"FFmpeg process timed out for clip {self.current_clip_index + 1}")
+        if self.process and self.process.state() == QProcess.ProcessState.Running:
+            self.process.kill()
+            self.process.waitForFinished(5000)  # Wait up to 5 seconds for clean shutdown
+        self._handle_process_failure()
+
+    def _handle_process_failure(self):
+        """Handle process failure by skipping to next clip"""
+        logger.warning(f"Skipping failed clip {self.current_clip_index + 1}")
+        self.progress.emit(int(((self.current_clip_index + 1) / self.total_clips) * 100))
+        self.current_clip_index += 1
+        self._start_next_process()
+
     def _on_process_finished(self, exit_code, exit_status):
+        # Stop the timeout timer
+        self.timeout_timer.stop()
+
         if not self._is_running:
             return
+
+        # Check if we already handled this clip due to an error
+        if self.current_clip_index >= self.total_clips:
+            return
+
         output_path = self.commands_to_run[self.current_clip_index][1]
+
+        logger.info(f"FFmpeg process finished for clip {self.current_clip_index + 1} with exit code {exit_code}")
 
         # 1. التحقق من نجاح عملية FFmpeg
         if exit_status == QProcess.ExitStatus.NormalExit and exit_code == 0:
@@ -367,11 +468,13 @@ class VideoSplitterWorker(QObject):
                         "ai_suggestion": action_suggestion,
                         "source_path": output_path,
                     }
+                    logger.info(f"AI analysis completed for clip {output_path}: {action_suggestion}")
                 else:
                     self.created_files[output_path] = {
                         "ai_suggestion": "unknown",
                         "source_path": output_path,
                     }
+                    logger.warning(f"Could not read frame from clip {output_path}")
             except Exception as e:
                 logger.error(f"AI analysis failed for clip {output_path}: {e}")
                 self.created_files[output_path] = {
@@ -381,7 +484,7 @@ class VideoSplitterWorker(QObject):
         else:
             error_output = self.process.readAllStandardError().data().decode("utf-8", "ignore")
             logger.error(
-                f"Failed to create clip {self.current_clip_index + 1}. Stderr: {error_output}"
+                f"Failed to create clip {self.current_clip_index + 1}. Exit code: {exit_code}, Stderr: {error_output}"
             )
 
         self.progress.emit(int(((self.current_clip_index + 1) / self.total_clips) * 100))
@@ -390,6 +493,8 @@ class VideoSplitterWorker(QObject):
 
     def stop(self):
         self._is_running = False
+        self.timeout_timer.stop()
         if self.process and self.process.state() == QProcess.ProcessState.Running:
             self.process.finished.disconnect(self._on_process_finished)
             self.process.kill()
+            self.process.waitForFinished(3000)  # Wait up to 3 seconds

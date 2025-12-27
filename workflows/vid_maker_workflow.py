@@ -27,6 +27,18 @@ class VidMakerWorkflow(QObject):
         logger.info(
             f"Received {len(clips_timestamps)} timestamps. Starting video splitting worker."
         )
+
+        # Validate input
+        if not self.project.source_video_path or not os.path.exists(self.project.source_video_path):
+            logger.error(f"Source video path is invalid: {self.project.source_video_path}")
+            self.splitting_finished({})
+            return
+
+        if not clips_timestamps:
+            logger.warning("No timestamps provided for video splitting")
+            self.splitting_finished({})
+            return
+
         temp_clips_folder = self._get_temp_folder("vids_clips")
 
         # [THE FIX] Pass the required 'self.pipeline' object to the worker's constructor.

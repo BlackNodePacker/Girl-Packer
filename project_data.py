@@ -39,6 +39,7 @@ class Project:
             "_shared_photoshoots": {},
             "_shared_videoshoots": {},
         }
+        logger.info("Project instance created with default export data structure")
 
     # قائمة بملحقات الملفات التي نريد تحميلها
     MEDIA_EXTENSIONS = (".webp", ".png", ".jpg", ".jpeg", ".webm", ".mp4")
@@ -170,13 +171,25 @@ class Project:
             logger.error(f"Failed to save event JSON data: {e}")
 
         # 3. توليد وحفظ ملف Ren'Py (.rpy)
-        # يفترض أن generate_event_rpy يتوقع الهياكل التالية:
-        rpy_file_path = generate_event_rpy(
-            event_config=event_config_data,
-            event_script_data=event_script_data,
-            event_folder=event_pack_folder,
-        )
-        if rpy_file_path:
-            success_rpy = True
+        if isinstance(event_script_data, str):
+            # If event_script_data is already the RPY content string, save it directly
+            rpy_file_path = os.path.join(event_pack_folder, f"event_{event_name}.rpy")
+            try:
+                with open(rpy_file_path, "w", encoding="utf-8") as f:
+                    f.write(event_script_data)
+                success_rpy = True
+                logger.info(f"Event RPY script saved to: {rpy_file_path}")
+            except Exception as e:
+                logger.error(f"Failed to save event RPY script: {e}")
+                success_rpy = False
+        else:
+            # Assume it's structured data, generate RPY
+            rpy_file_path = generate_event_rpy(
+                event_config=event_config_data,
+                event_script_data=event_script_data,
+                event_folder=event_pack_folder,
+            )
+            if rpy_file_path:
+                success_rpy = True
 
         return success_json and success_rpy

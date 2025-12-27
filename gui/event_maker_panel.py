@@ -6,6 +6,8 @@ import json
 import re
 from datetime import datetime
 
+from tools.video_transcriber import transcribe_video, format_transcription_to_rpy
+
 # **********************************************
 # * PySide6 Imports *
 # **********************************************
@@ -727,6 +729,11 @@ class EventMakerPanel(QWidget):
 
         list_layout.addWidget(QLabel("Note: Assets are named (pic1, vid1) for easy scripting."))
 
+        # Transcribe button for videos
+        transcribe_btn = QPushButton("Transcribe Selected Video")
+        transcribe_btn.clicked.connect(self._on_transcribe_video)
+        list_layout.addWidget(transcribe_btn)
+
         self.media_list_widget.doubleClicked.connect(self._on_media_double_click)
         self.media_list_widget.currentRowChanged.connect(self._on_asset_selection_changed)
 
@@ -1275,12 +1282,15 @@ class EventMakerPanel(QWidget):
     # ... (RPY Generation & Saving functions are kept the same) ...
     def _on_save_event(self):
         """Collects all data and calls the project manager to generate and save files."""
+        logger.info("Starting event save process.")
         # 1. Basic Data Collection
         event_name = self.event_name_input.text().strip()
         if not event_name:
+            logger.error("Event save failed: Event Internal Name is empty.")
             QMessageBox.critical(self, "Error", "Event Internal Name cannot be empty.")
             return
 
+        logger.debug(f"Event name: {event_name}")
         normalized_event_name = event_name.lower().replace(" ", "_").replace("-", "_")
         girl_id = self.girl_id_input.text().strip()
         # تمت إزالة متغير shoot_name
@@ -1288,8 +1298,10 @@ class EventMakerPanel(QWidget):
         # --- 2. Impacts Data Collection (Ensure current impacts are saved) ---
         self._save_current_participant_impacts()
         final_impacts = self.participant_impacts_data
+        logger.debug(f"Collected impacts data for {len(final_impacts)} participants")
 
         # --- 3. Requirements Data Collection ---
+        logger.debug("Collecting requirements data...")
         stat_reqs_data = self._get_table_data(self.stat_requirements_table.findChild(QTableWidget))
         stat_requirements_list = []
         for item in stat_reqs_data:
@@ -1340,6 +1352,7 @@ class EventMakerPanel(QWidget):
         }
 
         stages_list_from_ui = self._get_list_widget_items(self.stages_list)
+        logger.debug(f"Collected {len(stages_list_from_ui)} stages")
 
         # --- 4. Assemble Final JSON Data ---
         event_data_json = {
@@ -1369,14 +1382,18 @@ class EventMakerPanel(QWidget):
             "impacts": final_impacts,
             "stages": stages_list_from_ui,
         }
+        logger.info(f"Assembled event data JSON for '{normalized_event_name}'")
 
         # --- 5. RPY Script Generation ---\
         rpy_content = self._generate_rpy_script_content(normalized_event_name)
+        logger.info(f"Generated RPY content: {len(rpy_content)} characters")
 
         # --- 6. Save Files ---
         if self._write_files_to_disk(normalized_event_name, event_data_json, rpy_content):
+            logger.info(f"Event '{event_name}' saved successfully.")
             QMessageBox.information(self, "Success", f"Event '{event_name}' saved successfully.")
         else:
+            logger.error(f"Failed to save event '{event_name}'.")
             QMessageBox.critical(self, "Error", "Failed to save event files. Check logs.")
 
     def _generate_rpy_script_content(self, normalized_event_name):
@@ -1390,12 +1407,14 @@ class EventMakerPanel(QWidget):
         self._save_current_stage_script()
 
         stage_names = self._get_list_widget_items(self.stages_list)
+        logger.debug(f"Processing {len(stage_names)} stages for RPY")
 
         # 1. Define image/video assets at the top of the RPY script
         rpy_script += "# --- Asset Definitions (Based on Media Library) ---\n"
         for script_name, info in self.available_assets.items():
             rpy_script += f'image {script_name} = "{info["rpy_path_hint"]}"\n'
         rpy_script += "\n"
+        logger.debug(f"Defined {len(self.available_assets)} assets in RPY")
 
         # 2. Add event label definitions
         for stage_name in stage_names:
@@ -1422,18 +1441,67 @@ class EventMakerPanel(QWidget):
 
         return rpy_script
 
+    def _on_transcribe_video(self):
+        """Transcribes the selected video and inserts the formatted script into the current stage."""
+        selected_item = self.media_list_widget.currentItem()
+        if not selected_item:
+            QMessageBox.warning(self, "No Selection", "Please select a video from the media list.")
+            return
+
+        script_name = selected_item.data(Qt.ItemDataRole.UserRole)
+        if script_name not in self.available_assets:
+            QMessageBox.warning(self, "Invalid Asset", "Selected asset not found.")
+            return
+
+        asset_info = self.available_assets[script_name]
+        if asset_info["type"] != "video":
+            QMessageBox.warning(self, "Not a Video", "Please select a video asset to transcribe.")
+            return
+
+        video_path = asset_info["path"]
+        logger.info(f"Transcribing video: {video_path}")
+
+        # Show progress
+        QMessageBox.information(self, "Transcription", "Starting transcription. This may take a while...")
+
+        transcription = transcribe_video(video_path)
+        if not transcription:
+            QMessageBox.critical(self, "Transcription Failed", "Failed to transcribe the video.")
+            return
+
+        # Format to RPY
+        character_name = "character"  # Default, can be customized
+        rpy_script = format_transcription_to_rpy(transcription, character_name)
+
+        # Insert into current stage
+        current_stage = self.stages_list.currentItem()
+        if not current_stage:
+            QMessageBox.warning(self, "No Stage Selected", "Please select a stage to insert the script.")
+            return
+
+        stage_name = current_stage.text()
+        current_text = self.current_script_data.get(stage_name, "")
+        new_text = current_text + "\n" + rpy_script if current_text else rpy_script
+        self.current_script_data[stage_name] = new_text
+
+        # Update the script editor if it's the current stage
+        if self.script_editor.toPlainText() != new_text:
+            self.script_editor.setPlainText(new_text)
+
+        QMessageBox.information(self, "Success", "Transcription inserted into the current stage.")
+
     def _write_files_to_disk(self, event_name, event_data_json, rpy_content):
         """Calls the project manager to save the generated JSON and RPY files."""
         try:
             # تم تعديل اسم الدالة المتوقعة إلى 'save_event_definition' بناءً على الخطأ في السجل
-            if hasattr(self.project_manager, "save_event_definition"):
-                self.project_manager.save_event_definition(
-                    event_name, event_data_json, {"script_content": rpy_content}
+            if hasattr(self.project_manager, "save_event_files"):
+                self.project_manager.save_event_files(
+                    event_name, event_data_json, rpy_content
                 )
                 return True
             else:
                 # تم تحديث رسالة الخطأ لتعكس اسم الدالة الصحيح
-                raise AttributeError("Project Manager is missing 'save_event_definition' method.")
+                raise AttributeError("Project Manager is missing 'save_event_files' method.")
         except Exception as e:
             logger.error(f"Error saving event files: {type(e).__name__}: {e}")
             return False
