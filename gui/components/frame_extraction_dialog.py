@@ -1,8 +1,17 @@
 ﻿# GameMediaTool/gui/components/frame_extraction_dialog.py (New File)
 
-from PySide6.QtWidgets import (QDialog, QVBoxLayout, QGridLayout, QDialogButtonBox, 
-                               QLabel, QDoubleSpinBox, QSpinBox, QGroupBox)
+from PySide6.QtWidgets import (
+    QDialog,
+    QVBoxLayout,
+    QGridLayout,
+    QDialogButtonBox,
+    QLabel,
+    QDoubleSpinBox,
+    QSpinBox,
+    QGroupBox,
+)
 from PySide6.QtCore import Qt
+
 
 class FrameExtractionDialog(QDialog):
     def __init__(self, parent=None, default_interval=2, default_threshold=60.0):
@@ -11,7 +20,7 @@ class FrameExtractionDialog(QDialog):
         self.setMinimumWidth(350)
 
         layout = QVBoxLayout(self)
-        
+
         main_group = QGroupBox("Adjust Quantity vs. Quality")
         grid_layout = QGridLayout(main_group)
 
@@ -30,12 +39,16 @@ class FrameExtractionDialog(QDialog):
         self.threshold_spinbox.setRange(10.0, 500.0)
         self.threshold_spinbox.setValue(default_threshold)
         self.threshold_spinbox.setSingleStep(5.0)
-        self.threshold_spinbox.setToolTip("How strict the quality filter is. Smaller number = MORE frames (less sharp).")
+        self.threshold_spinbox.setToolTip(
+            "How strict the quality filter is. Smaller number = MORE frames (less sharp)."
+        )
         grid_layout.addWidget(self.threshold_spinbox, 1, 1)
-        
+
         layout.addWidget(main_group)
 
-        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
@@ -44,5 +57,5 @@ class FrameExtractionDialog(QDialog):
         """Returns the selected settings as a dictionary."""
         return {
             "interval_seconds": self.interval_spinbox.value(),
-            "blur_threshold": self.threshold_spinbox.value()
+            "blur_threshold": self.threshold_spinbox.value(),
         }

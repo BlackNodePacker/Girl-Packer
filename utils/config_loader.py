@@ -5,6 +5,7 @@ from tools.logger import get_logger
 
 logger = get_logger("ConfigLoader")
 
+
 def load_config(config_path: str = "config.yaml") -> dict:
     """
     Loads a configuration dictionary from a YAML file.
@@ -16,7 +17,7 @@ def load_config(config_path: str = "config.yaml") -> dict:
         dict: The configuration dictionary, or an empty dict if an error occurs.
     """
     try:
-        with open(config_path, 'r', encoding='utf-8') as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             config = yaml.safe_load(f)
             logger.info(f"Configuration loaded successfully from {config_path}")
             return config

@@ -1,10 +1,17 @@
 ﻿# GameMediaTool/gui/main_window.py (Corrected typo in export thread cleanup)
 
 import os
-import sys
-import subprocess
-from PySide6.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QStackedWidget, QMessageBox, QProgressDialog, QDialog, QFileDialog)
-from PySide6.QtCore import QSettings, QDir, Signal, QThread, Qt, QUrl
+from PySide6.QtWidgets import (
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QStackedWidget,
+    QMessageBox,
+    QProgressDialog,
+    QDialog,
+    QFileDialog,
+)
+from PySide6.QtCore import QSettings, QThread, Qt, QUrl
 from PySide6.QtGui import QDesktopServices
 
 from .dashboard_panel import DashboardPanel
@@ -14,7 +21,7 @@ from .vids_maker_panel import VidsMakerPanel
 from .photo_maker_panel import PhotoMakerPanel
 from .shoot_maker_panel import ShootMakerPanel
 from .character_setup_panel import CharacterSetupPanel
-from .event_maker_panel import EventMakerPanel # [NEW] Import the new panel
+from .event_maker_panel import EventMakerPanel  # [NEW] Import the new panel
 from .components import ExportWorker, FrameExtractionDialog
 from tools.logger import get_logger
 from tools import video_splitter
@@ -28,6 +35,7 @@ from workflows.vid_maker_workflow import VidMakerWorkflow
 from workflows.shoot_maker_workflow import ShootMakerWorkflow
 
 logger = get_logger("MainWindow")
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -49,7 +57,7 @@ class MainWindow(QMainWindow):
     # **********************************************
     # * NEW METHODS FOR EVENTMAKERPANEL INTERFACE *
     # **********************************************
-    
+
     # [FIXED INDENTATION]
     def get_asset_file_paths(self):
         """
@@ -67,7 +75,7 @@ class MainWindow(QMainWindow):
         """
         # نستخدم TagManager مباشرة
         return self.tag_manager.get_all_traits()
-        
+
     # [FIXED INDENTATION]
     def save_event_files(self, event_name, event_data_json, rpy_content):
         """
@@ -104,13 +112,18 @@ class MainWindow(QMainWindow):
         self.photo_maker_panel = PhotoMakerPanel(self)
         self.shoot_maker_panel = ShootMakerPanel(self)
         # [MODIFIED] Pass 'self' (MainWindow) as the project_manager interface
-        self.event_maker_panel = EventMakerPanel(self) 
+        self.event_maker_panel = EventMakerPanel(self)
 
         # [MODIFIED] Add the new panel to the list of widgets for the stack
         panels_to_add = [
-            self.setup_panel, self.dashboard_panel, self.ai_training_panel,
-            self.data_review_panel, self.vids_maker_panel, self.photo_maker_panel,
-            self.shoot_maker_panel, self.event_maker_panel
+            self.setup_panel,
+            self.dashboard_panel,
+            self.ai_training_panel,
+            self.data_review_panel,
+            self.vids_maker_panel,
+            self.photo_maker_panel,
+            self.shoot_maker_panel,
+            self.event_maker_panel,
         ]
         for panel in panels_to_add:
             self.view_stack.addWidget(panel)
@@ -123,17 +136,25 @@ class MainWindow(QMainWindow):
         self.dashboard_panel.generate_vids_requested.connect(self.start_vid_maker_workflow)
         self.dashboard_panel.photo_maker_requested.connect(self.start_photo_maker_workflow)
         self.dashboard_panel.shoot_maker_requested.connect(self.start_shoot_maker_workflow)
-        self.dashboard_panel.event_maker_requested.connect(self.start_event_maker_workflow) # [NEW] Connect the dashboard signal
+        self.dashboard_panel.event_maker_requested.connect(
+            self.start_event_maker_workflow
+        )  # [NEW] Connect the dashboard signal
 
         self.dashboard_panel.export_pack_requested.connect(self._start_final_export)
-        self.dashboard_panel.ai_center_requested.connect(lambda: self.workflow_manager.go_to('ai_center'))
+        self.dashboard_panel.ai_center_requested.connect(
+            lambda: self.workflow_manager.go_to("ai_center")
+        )
         self.dashboard_panel.path_change_requested.connect(self._change_output_path)
 
         self.photo_maker_panel.yolo_analysis_requested.connect(self.start_yolo_analysis)
-        self.photo_maker_panel.final_processing_requested.connect(self.photo_maker_workflow.run_final_processing)
+        self.photo_maker_panel.final_processing_requested.connect(
+            self.photo_maker_workflow.run_final_processing
+        )
         self.photo_maker_workflow.extraction_finished.connect(self._on_extraction_finished)
         self.photo_maker_workflow.yolo_analysis_finished.connect(self._on_yolo_finished)
-        self.photo_maker_workflow.final_processing_finished.connect(self.photo_maker_panel.on_final_processing_finished)
+        self.photo_maker_workflow.final_processing_finished.connect(
+            self.photo_maker_panel.on_final_processing_finished
+        )
         self.photo_maker_panel.back_requested.connect(self.go_to_dashboard)
 
         self.vids_maker_panel.splitting_requested.connect(self.start_video_splitting)
@@ -141,25 +162,39 @@ class MainWindow(QMainWindow):
         self.vids_maker_panel.export_complete.connect(self._update_dashboard_state)
         self.vids_maker_panel.back_requested.connect(self.go_to_dashboard)
 
-        self.shoot_maker_panel.sources_requested.connect(self.shoot_maker_workflow.load_available_sources)
-        self.shoot_maker_panel.ai_analysis_requested.connect(self.shoot_maker_workflow.run_ai_analysis_for_suggestions)
+        self.shoot_maker_panel.sources_requested.connect(
+            self.shoot_maker_workflow.load_available_sources
+        )
+        self.shoot_maker_panel.ai_analysis_requested.connect(
+            self.shoot_maker_workflow.run_ai_analysis_for_suggestions
+        )
         self.shoot_maker_panel.save_shoot_requested.connect(self._on_save_shoot_requested)
-        self.shoot_maker_workflow.available_sources_loaded.connect(self.shoot_maker_panel.display_sources)
-        self.shoot_maker_workflow.ai_suggestions_ready.connect(self.shoot_maker_panel.apply_ai_suggestions)
+        self.shoot_maker_workflow.available_sources_loaded.connect(
+            self.shoot_maker_panel.display_sources
+        )
+        self.shoot_maker_workflow.ai_suggestions_ready.connect(
+            self.shoot_maker_panel.apply_ai_suggestions
+        )
         self.shoot_maker_panel.back_requested.connect(self.go_to_dashboard)
 
-        self.event_maker_panel.back_requested.connect(self.go_to_dashboard) # [NEW] Connect the back button for the new panel
+        self.event_maker_panel.back_requested.connect(
+            self.go_to_dashboard
+        )  # [NEW] Connect the back button for the new panel
 
         self.ai_training_panel.back_to_dashboard.connect(self.go_to_dashboard)
-        self.ai_training_panel.review_data_requested.connect(lambda: self.workflow_manager.go_to('data_review'))
+        self.ai_training_panel.review_data_requested.connect(
+            lambda: self.workflow_manager.go_to("data_review")
+        )
 
     def go_to_dashboard(self):
-        if self.project.source_type == 'video' and self.project.video_duration == 0:
-            try: # Add try-except block for robustness
-                self.project.video_duration = video_splitter.get_video_duration(self.project.source_video_path)
+        if self.project.source_type == "video" and self.project.video_duration == 0:
+            try:  # Add try-except block for robustness
+                self.project.video_duration = video_splitter.get_video_duration(
+                    self.project.source_video_path
+                )
             except Exception as e:
                 logger.error(f"Failed to get video duration on going to dashboard: {e}")
-                self.project.video_duration = 0 # Ensure it has a value even on error
+                self.project.video_duration = 0  # Ensure it has a value even on error
         self.view_stack.setCurrentWidget(self.dashboard_panel)
         self._update_dashboard_state()
 
@@ -170,12 +205,12 @@ class MainWindow(QMainWindow):
         dashboard.disable_all_buttons()
 
         if project.character_name:
-            source_is_video = (project.source_type == 'video')
+            source_is_video = project.source_type == "video"
 
             dashboard.vids_button.setEnabled(source_is_video)
             dashboard.photo_maker_button.setEnabled(True)
             dashboard.shoot_maker_button.setEnabled(True)
-            dashboard.event_maker_button.setEnabled(True) # [NEW] Enable the event maker button
+            dashboard.event_maker_button.setEnabled(True)  # [NEW] Enable the event maker button
             dashboard.ai_button.setEnabled(True)
 
             if project.is_ready_for_export():
@@ -183,37 +218,56 @@ class MainWindow(QMainWindow):
 
     # [NEW] Add the workflow start method for the event maker
     def start_event_maker_workflow(self):
-        self.workflow_manager.go_to('event_maker')
+        self.workflow_manager.go_to("event_maker")
 
     # --- All other methods remain unchanged, included for completeness ---
     def _change_output_path(self):
-        new_path = QFileDialog.getExistingDirectory(self, "Select Final Output Directory", self.project.final_output_path)
+        new_path = QFileDialog.getExistingDirectory(
+            self, "Select Final Output Directory", self.project.final_output_path
+        )
         if new_path:
             self.project.final_output_path = new_path
             self.settings.setValue("final_output_path", new_path)
             self.dashboard_panel.output_path_label.setText(new_path)
 
     def _start_final_export(self):
-        reply = QMessageBox.question(self, 'Final Export', "Start final export?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if reply == QMessageBox.StandardButton.No: return
+        reply = QMessageBox.question(
+            self,
+            "Final Export",
+            "Start final export?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.No:
+            return
         self.progress_dialog = QProgressDialog("Exporting Girl Pack...", "Cancel", 0, 0, self)
-        self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal); self.progress_dialog.show()
+        self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self.progress_dialog.show()
 
-        self.export_thread = QThread() # Create the thread instance
+        self.export_thread = QThread()  # Create the thread instance
         self.export_worker = ExportWorker(self.project, self.pipeline)
         self.export_worker.moveToThread(self.export_thread)
 
         self.export_thread.started.connect(self.export_worker.run)
-        self.progress_dialog.canceled.connect(self.export_worker.stop) # Connect cancel to worker's stop
-        self.export_worker.finished.connect(self._on_export_finished) # Worker finished -> UI update
+        self.progress_dialog.canceled.connect(
+            self.export_worker.stop
+        )  # Connect cancel to worker's stop
+        self.export_worker.finished.connect(
+            self._on_export_finished
+        )  # Worker finished -> UI update
 
         # Cleanup connections
-        self.export_worker.finished.connect(self.export_thread.quit) # Worker finished -> Quit thread
-        self.export_worker.finished.connect(self.export_worker.deleteLater) # Worker finished -> Delete worker
+        self.export_worker.finished.connect(
+            self.export_thread.quit
+        )  # Worker finished -> Quit thread
+        self.export_worker.finished.connect(
+            self.export_worker.deleteLater
+        )  # Worker finished -> Delete worker
         # [THE FIX] Connect the THREAD's finished signal, not the worker's again
-        self.export_thread.finished.connect(self.export_thread.deleteLater) # Thread finished -> Delete thread
+        self.export_thread.finished.connect(
+            self.export_thread.deleteLater
+        )  # Thread finished -> Delete thread
 
-        self.export_thread.start() # Start the thread
+        self.export_thread.start()  # Start the thread
 
     def _on_export_finished(self, result_path):
         logger.debug("--- _on_export_finished slot has been called ---")
@@ -232,73 +286,115 @@ class MainWindow(QMainWindow):
 
         if result_path and path_exists:
             logger.debug("Condition PASSED. Showing success message box.")
-            msg_box = QMessageBox(QMessageBox.Icon.Information, "Success!", f"Pack for '{self.project.character_name}' created!")
-            open_folder_button = msg_box.addButton("Open Output Folder", QMessageBox.ButtonRole.ActionRole)
+            msg_box = QMessageBox(
+                QMessageBox.Icon.Information,
+                "Success!",
+                f"Pack for '{self.project.character_name}' created!",
+            )
+            open_folder_button = msg_box.addButton(
+                "Open Output Folder", QMessageBox.ButtonRole.ActionRole
+            )
             msg_box.addButton(QMessageBox.StandardButton.Ok)
             msg_box.exec()
 
             if msg_box.clickedButton() == open_folder_button:
                 QDesktopServices.openUrl(QUrl.fromLocalFile(result_path))
         else:
-            logger.error("Condition FAILED. Bypassing success message box. The result_path was either empty or did not exist.")
-            QMessageBox.critical(self, "Export Information",
-                                 f"The export process completed, but the output path could not be verified automatically.\n\n"
-                                 f"Please check your output directory manually.\n\n"
-                                 f"Path checked: {result_path}")
+            logger.error(
+                "Condition FAILED. Bypassing success message box. The result_path was either empty or did not exist."
+            )
+            QMessageBox.critical(
+                self,
+                "Export Information",
+                f"The export process completed, but the output path could not be verified automatically.\n\n"
+                f"Please check your output directory manually.\n\n"
+                f"Path checked: {result_path}",
+            )
 
     def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Confirm Exit', "Are you sure?", QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
-        if reply == QMessageBox.StandardButton.Yes: event.accept()
-        else: event.ignore()
+        reply = QMessageBox.question(
+            self,
+            "Confirm Exit",
+            "Are you sure?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+        )
+        if reply == QMessageBox.StandardButton.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
     def start_photo_maker_workflow(self):
-        stype = self.project.source_type; settings = None
-        if self.project.export_data.get('all_created_clips'):
-            msg_box = QMessageBox(self); msg_box.setWindowTitle("Choose Source"); msg_box.setText("Found split clips. Which source to use for frame extraction?")
-            full_video_button = msg_box.addButton("Full Video", QMessageBox.ButtonRole.ActionRole); clips_button = msg_box.addButton("Split Clips", QMessageBox.ButtonRole.ActionRole); msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole); msg_box.exec()
+        stype = self.project.source_type
+        settings = None
+        if self.project.export_data.get("all_created_clips"):
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle("Choose Source")
+            msg_box.setText("Found split clips. Which source to use for frame extraction?")
+            full_video_button = msg_box.addButton("Full Video", QMessageBox.ButtonRole.ActionRole)
+            clips_button = msg_box.addButton("Split Clips", QMessageBox.ButtonRole.ActionRole)
+            msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+            msg_box.exec()
             clicked = msg_box.clickedButton()
-            if clicked == full_video_button: stype = 'video'
-            elif clicked == clips_button: stype = 'clips'
-            else: return
+            if clicked == full_video_button:
+                stype = "video"
+            elif clicked == clips_button:
+                stype = "clips"
+            else:
+                return
 
-        if stype != 'folder':
-            dialog = FrameExtractionDialog(self, self.config.get('image', {}).get('interval_seconds', 2), self.config.get('image', {}).get('blur_threshold', 60.0))
-            if not dialog.exec() == QDialog.DialogCode.Accepted: return
+        if stype != "folder":
+            dialog = FrameExtractionDialog(
+                self,
+                self.config.get("image", {}).get("interval_seconds", 2),
+                self.config.get("image", {}).get("blur_threshold", 60.0),
+            )
+            if not dialog.exec() == QDialog.DialogCode.Accepted:
+                return
             settings = dialog.get_settings()
-            self.progress_dialog = QProgressDialog("Extracting Frames...", "Cancel", 0, 100, self); self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+            self.progress_dialog = QProgressDialog("Extracting Frames...", "Cancel", 0, 100, self)
+            self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
             self.photo_maker_workflow.progress_updated.connect(self.progress_dialog.setValue)
-            if hasattr(self.photo_maker_workflow, 'stop_current_task'): self.progress_dialog.canceled.connect(self.photo_maker_workflow.stop_current_task)
+            if hasattr(self.photo_maker_workflow, "stop_current_task"):
+                self.progress_dialog.canceled.connect(self.photo_maker_workflow.stop_current_task)
             self.progress_dialog.show()
             self.photo_maker_workflow.start_workflow(stype, settings)
         else:
             self.photo_maker_workflow.start_workflow(stype)
-        self.workflow_manager.go_to('photo_maker')
+        self.workflow_manager.go_to("photo_maker")
 
     def _on_extraction_finished(self, source_frames):
-        if hasattr(self, 'progress_dialog') and self.progress_dialog.isVisible(): self.progress_dialog.close()
+        if hasattr(self, "progress_dialog") and self.progress_dialog.isVisible():
+            self.progress_dialog.close()
         self.photo_maker_panel.activate_and_load_frames(source_frames)
 
     def start_yolo_analysis(self, selected_paths):
-        self.progress_dialog = QProgressDialog("AI is analyzing frames...", "Cancel", 0, 100, self); self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self.progress_dialog = QProgressDialog("AI is analyzing frames...", "Cancel", 0, 100, self)
+        self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
         self.photo_maker_workflow.progress_updated.connect(self.progress_dialog.setValue)
-        if hasattr(self.photo_maker_workflow, 'stop_current_task'): self.progress_dialog.canceled.connect(self.photo_maker_workflow.stop_current_task)
-        self.progress_dialog.show(); self.photo_maker_workflow.run_yolo_analysis(selected_paths)
+        if hasattr(self.photo_maker_workflow, "stop_current_task"):
+            self.progress_dialog.canceled.connect(self.photo_maker_workflow.stop_current_task)
+        self.progress_dialog.show()
+        self.photo_maker_workflow.run_yolo_analysis(selected_paths)
 
     def _on_yolo_finished(self, yolo_results, selected_paths, tasks):
-        if hasattr(self, 'progress_dialog') and self.progress_dialog.isVisible(): self.progress_dialog.close()
+        if hasattr(self, "progress_dialog") and self.progress_dialog.isVisible():
+            self.progress_dialog.close()
         self.photo_maker_panel.go_to_workshop(yolo_results, selected_paths, tasks)
 
     def start_vid_maker_workflow(self):
-        self.workflow_manager.go_to('vid_maker'); self.vids_maker_panel.activate()
+        self.workflow_manager.go_to("vid_maker")
+        self.vids_maker_panel.activate()
 
     def start_video_splitting(self, clips_timestamps):
         self.vids_maker_panel.clipper_step.stop_video()
 
-        self.progress_dialog = QProgressDialog("Splitting & Analyzing Clips...", "Cancel", 0, 100, self)
+        self.progress_dialog = QProgressDialog(
+            "Splitting & Analyzing Clips...", "Cancel", 0, 100, self
+        )
         self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
         self.vid_maker_workflow.progress_updated.connect(self.progress_dialog.setValue)
 
-        if hasattr(self.vid_maker_workflow, 'stop_current_task'):
+        if hasattr(self.vid_maker_workflow, "stop_current_task"):
             self.progress_dialog.canceled.connect(self.vid_maker_workflow.stop_current_task)
 
         self.progress_dialog.show()
@@ -306,19 +402,25 @@ class MainWindow(QMainWindow):
         self.vid_maker_workflow.run_video_splitting(clips_timestamps)
 
     def _on_splitting_finished(self, clips_data_with_ai):
-        if hasattr(self, 'progress_dialog') and self.progress_dialog.isVisible(): self.progress_dialog.close()
+        if hasattr(self, "progress_dialog") and self.progress_dialog.isVisible():
+            self.progress_dialog.close()
         if clips_data_with_ai:
             all_paths = list(clips_data_with_ai.keys())
-            self.project.export_data['all_created_clips'] = all_paths
+            self.project.export_data["all_created_clips"] = all_paths
             logger.info(f"Saved {len(all_paths)} created clip paths to project.")
-        try: self.vid_maker_workflow.progress_updated.disconnect(self.progress_dialog.setValue)
-        except RuntimeError: pass
+        try:
+            self.vid_maker_workflow.progress_updated.disconnect(self.progress_dialog.setValue)
+        except RuntimeError:
+            pass
         self.vids_maker_panel.on_splitting_finished(clips_data_with_ai)
 
     def start_shoot_maker_workflow(self):
-        self.workflow_manager.go_to('shoot_maker'); self.shoot_maker_panel.activate()
+        self.workflow_manager.go_to("shoot_maker")
+        self.shoot_maker_panel.activate()
 
     def _on_save_shoot_requested(self, shoot_data):
         self.shoot_maker_workflow.save_shoot_to_project(shoot_data)
-        QMessageBox.information(self, "Shoot Saved", f"Shoot '{shoot_data['config']['display_name']}' has been saved.")
-        self.go_to_dashboard() # <-- تم التصحيح هنا
+        QMessageBox.information(
+            self, "Shoot Saved", f"Shoot '{shoot_data['config']['display_name']}' has been saved."
+        )
+        self.go_to_dashboard()  # <-- تم التصحيح هنا

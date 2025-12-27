@@ -1,8 +1,10 @@
 ﻿"""
 ملف تدريب النماذج على البيانات المصنفة.
 """
+
 from pathlib import Path
 from tools.logger import logger
+
 
 class Trainer:
     def __init__(self, yolo_model, cnn_model):

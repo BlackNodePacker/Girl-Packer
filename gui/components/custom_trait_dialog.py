@@ -1,7 +1,7 @@
 ﻿# GameMediaTool/gui/components/custom_trait_dialog.py (New File)
 
-from PySide6.QtWidgets import (QDialog, QVBoxLayout, QGridLayout, QDialogButtonBox, 
-                               QLabel, QLineEdit)
+from PySide6.QtWidgets import QDialog, QVBoxLayout, QGridLayout, QDialogButtonBox, QLabel, QLineEdit
+
 
 class CustomTraitDialog(QDialog):
     def __init__(self, initial_data=None, parent=None):
@@ -34,7 +34,9 @@ class CustomTraitDialog(QDialog):
 
         layout.addLayout(grid_layout)
 
-        button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        button_box = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         button_box.accepted.connect(self.accept)
         button_box.rejected.connect(self.reject)
         layout.addWidget(button_box)
@@ -50,11 +52,11 @@ class CustomTraitDialog(QDialog):
         display_name = self.name_input.text().strip()
         tag_name = self.tag_input.text().strip()
         if not display_name or not tag_name:
-            return None # Basic validation
+            return None  # Basic validation
 
         return {
             "display_name": display_name,
             "tag_name": tag_name,
             "description": self.desc_input.text().strip(),
-            "modifiers_str": self.mod_input.text().strip()
+            "modifiers_str": self.mod_input.text().strip(),
         }

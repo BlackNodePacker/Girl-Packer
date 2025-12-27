@@ -11,12 +11,14 @@ from tools.logger import get_logger
 
 logger = get_logger("PhotoMakerPanel_UI")
 
+
 class PhotoMakerPanel(QWidget):
     """
     The UI-only panel for the Photo Maker workflow.
     It contains the ContactSheet and Workshop sub-panels and emits signals
     to a workflow controller, but contains no background logic itself.
     """
+
     back_requested = Signal()
     yolo_analysis_requested = Signal(list)
     final_processing_requested = Signal(dict)
@@ -25,19 +27,19 @@ class PhotoMakerPanel(QWidget):
         super().__init__(parent)
         self.main_window = main_window
         self.project = main_window.project
-        
+
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         self.step_stack = QStackedWidget()
         main_layout.addWidget(self.step_stack)
-        
+
         self.contact_sheet_step = ContactSheetPanel(self.main_window)
         self.image_workshop_step = ImageWorkshopPanel(self.main_window)
-        
+
         self.step_stack.addWidget(self.contact_sheet_step)
         self.step_stack.addWidget(self.image_workshop_step)
-        
+
         self.back_button = QPushButton("⬅️ Back to Dashboard")
         main_layout.addWidget(self.back_button)
 
@@ -56,7 +58,9 @@ class PhotoMakerPanel(QWidget):
         It loads the initial set of frames/images into the contact sheet.
         """
         if not source_frames:
-            QMessageBox.critical(self, "Error", "Photo Maker was started with no source frames or images.")
+            QMessageBox.critical(
+                self, "Error", "Photo Maker was started with no source frames or images."
+            )
             self.back_requested.emit()
             return
 
@@ -76,11 +80,15 @@ class PhotoMakerPanel(QWidget):
     def on_final_processing_finished(self, final_processed_images: list):
         """Receives the final results from the controller and shows a success message."""
         logger.info(f"UI received {len(final_processed_images)} processed images.")
-        
+
         project_data = self.main_window.project.export_data
-        if 'approved_images' not in project_data:
-            project_data['approved_images'] = []
-        project_data['approved_images'].extend(final_processed_images)
-        
-        QMessageBox.information(self, "Success", f"Successfully created {len(final_processed_images)} final image assets!")
+        if "approved_images" not in project_data:
+            project_data["approved_images"] = []
+        project_data["approved_images"].extend(final_processed_images)
+
+        QMessageBox.information(
+            self,
+            "Success",
+            f"Successfully created {len(final_processed_images)} final image assets!",
+        )
         self.back_requested.emit()

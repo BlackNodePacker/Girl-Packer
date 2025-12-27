@@ -9,12 +9,12 @@ from .vid_tagger_panel import VidTaggerPanel
 from .image_viewer_widget import ImageViewerWidget
 from .custom_trait_dialog import CustomTraitDialog
 from .manual_crop_dialog import ManualCropDialog
-from .frame_extraction_dialog import FrameExtractionDialog # <-- [ADD THIS LINE]
+from .frame_extraction_dialog import FrameExtractionDialog  # <-- [ADD THIS LINE]
 
 from .workers import (
     FrameExtractorWorker,
     YOLOWorker,
     FinalProcessorWorker,
     ExportWorker,
-    VideoSplitterWorker
+    VideoSplitterWorker,
 )

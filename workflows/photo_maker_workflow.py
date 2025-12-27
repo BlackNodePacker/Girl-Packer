@@ -9,12 +9,13 @@ from utils.file_ops import sanitize_filename, ensure_folder
 
 logger = get_logger("PhotoMakerWorkflow")
 
+
 class PhotoMakerWorkflow(QObject):
     extraction_finished = Signal(list)
     yolo_analysis_finished = Signal(dict, list, set)
     final_processing_finished = Signal(list)
     progress_updated = Signal(int)
-    
+
     def __init__(self, main_window):
         super().__init__()
         self.main_window = main_window
@@ -24,12 +25,16 @@ class PhotoMakerWorkflow(QObject):
         self.worker = None
 
     def start_workflow(self, source_type: str, settings: dict = None):
-        if source_type in ['video', 'clips']:
-            source_paths = self.project.export_data.get('all_created_clips', []) if source_type == 'clips' else [self.project.source_video_path]
+        if source_type in ["video", "clips"]:
+            source_paths = (
+                self.project.export_data.get("all_created_clips", [])
+                if source_type == "clips"
+                else [self.project.source_video_path]
+            )
             if not source_paths:
                 self.extraction_finished.emit([])
                 return
-            
+
             # [THE FIX] Perform the cleanup ONCE here, before starting the worker.
             output_folder = self._get_temp_folder("extracted_frames")
             if os.path.isdir(output_folder):
@@ -38,52 +43,58 @@ class PhotoMakerWorkflow(QObject):
             ensure_folder(output_folder)
 
             self._run_frame_extraction(source_paths, settings, output_folder)
-        elif source_type == 'folder':
+        elif source_type == "folder":
             self.extraction_finished.emit(self.project.source_image_paths)
 
     def _run_frame_extraction(self, video_paths: list, settings: dict, output_folder: str):
         settings = settings or {}
-        blur_thresh = settings.get('blur_threshold', 60.0)
-        interval = settings.get('interval_seconds', 1)
-        
-        logger.info(f"Starting frame extraction with blur threshold: {blur_thresh} and interval: {interval}s")
-        
-        worker = FrameExtractorWorker(video_paths, output_folder, blur_threshold=blur_thresh, interval_seconds=interval)
+        blur_thresh = settings.get("blur_threshold", 60.0)
+        interval = settings.get("interval_seconds", 1)
+
+        logger.info(
+            f"Starting frame extraction with blur threshold: {blur_thresh} and interval: {interval}s"
+        )
+
+        worker = FrameExtractorWorker(
+            video_paths, output_folder, blur_threshold=blur_thresh, interval_seconds=interval
+        )
         self._run_worker(worker, self.extraction_finished)
 
     def run_yolo_analysis(self, selected_paths: list):
-        tasks = {'body_assets', 'clothing_assets'}
+        tasks = {"body_assets", "clothing_assets"}
         worker = YOLOWorker(self.pipeline, selected_paths)
-        worker.finished.connect(lambda results: self.yolo_analysis_finished.emit(results, selected_paths, tasks))
+        worker.finished.connect(
+            lambda results: self.yolo_analysis_finished.emit(results, selected_paths, tasks)
+        )
         self._run_worker(worker, None)
 
     def run_final_processing(self, instructions: dict):
         worker = FinalProcessorWorker(self.main_window, instructions)
         self._run_worker(worker, self.final_processing_finished)
-        
+
     def _run_worker(self, worker_instance, finished_signal):
         self.thread = QThread(self)
         self.worker = worker_instance
         self.worker.moveToThread(self.thread)
-        
+
         if finished_signal:
             self.worker.finished.connect(finished_signal)
-        if hasattr(self.worker, 'progress'):
+        if hasattr(self.worker, "progress"):
             self.worker.progress.connect(self.progress_updated)
 
         self.worker.finished.connect(self.thread.quit)
         self.worker.finished.connect(self.worker.deleteLater)
         self.thread.finished.connect(self.thread.deleteLater)
-        
+
         self.thread.started.connect(self.worker.run)
         self.thread.start()
-        
+
         logger.info(f"Started worker '{type(self.worker).__name__}' in a new thread.")
 
     def stop_current_task(self):
-        if self.worker and hasattr(self.worker, 'stop'):
+        if self.worker and hasattr(self.worker, "stop"):
             self.worker.stop()
-        
+
     def _get_temp_folder(self, subfolder_name: str) -> str:
         char_name_safe = sanitize_filename(self.project.character_name)
         temp_folder = os.path.join("temp", char_name_safe, subfolder_name)

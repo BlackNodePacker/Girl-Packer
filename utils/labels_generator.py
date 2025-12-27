@@ -4,19 +4,20 @@ from tools.logger import get_logger
 
 logger = get_logger("Labels Generator")
 
+
 def generate_labels(frames_info: dict) -> dict:
     """
     Analyzes frame information from AI detection and generates final labels.
-    
+
     Args:
-        frames_info (dict): A dictionary where keys are frame paths and values are 
+        frames_info (dict): A dictionary where keys are frame paths and values are
                             lists of AI detections (label, confidence, etc.).
 
     Returns:
         dict: A dictionary of final labels for each frame.
     """
     logger.info("Starting automatic labeling...")
-    
+
     final_labels = {}
     for frame_path, detections in frames_info.items():
         labels = set()
@@ -30,7 +31,7 @@ def generate_labels(frames_info: dict) -> dict:
                 labels.add("ass")
             elif "pussy" in det["label"]:
                 labels.add("pussy")
-            
+
             # Additional labels based on clothing
             if "topless" in det["label"] or "bare" in det["label"]:
                 labels.add("topless")
@@ -38,6 +39,6 @@ def generate_labels(frames_info: dict) -> dict:
                 labels.add("bottomless")
 
         final_labels[frame_path] = list(labels)
-    
+
     logger.info("Automatic labeling completed.")
     return final_labels

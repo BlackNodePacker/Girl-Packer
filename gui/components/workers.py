@@ -16,6 +16,7 @@ from ai.yolo.yolo_utils import detect_objects
 
 logger = get_logger("Workers")
 
+
 class FrameExtractorWorker(QObject):
     progress = Signal(int)
     finished = Signal(list)
@@ -32,14 +33,16 @@ class FrameExtractorWorker(QObject):
         all_extracted_frames = []
         total_videos = len(self.video_paths)
         if total_videos == 0:
-            if self.is_running: self.finished.emit([])
+            if self.is_running:
+                self.finished.emit([])
             return
-            
+
         for i, video_path in enumerate(self.video_paths):
-            if not self.is_running: break
-            
+            if not self.is_running:
+                break
+
             logger.info(f"Worker starting frame extraction for clip {i + 1}/{total_videos}")
-            
+
             def progress_handler(sub_progress):
                 overall_progress = int(((i * 100) + sub_progress) / total_videos)
                 self.progress.emit(overall_progress)
@@ -49,7 +52,7 @@ class FrameExtractorWorker(QObject):
                 output_folder=self.output_folder,
                 progress_callback=progress_handler,
                 blur_threshold=self.blur_threshold,
-                interval_seconds=self.interval_seconds
+                interval_seconds=self.interval_seconds,
             )
             all_extracted_frames.extend(frames)
 
@@ -59,6 +62,7 @@ class FrameExtractorWorker(QObject):
 
     def stop(self):
         self.is_running = False
+
 
 class YOLOWorker(QObject):
     progress = Signal(int)
@@ -74,28 +78,30 @@ class YOLOWorker(QObject):
         yolo_results = {}
         total_frames = len(self.frame_paths)
         if total_frames == 0:
-            if self.is_running: self.finished.emit({})
+            if self.is_running:
+                self.finished.emit({})
             return
-            
+
         yolo_model_instance = self.pipeline.yolo_model
 
         if not yolo_model_instance:
             logger.error("YOLO model instance is None. Cannot run detection.")
-            if self.is_running: self.finished.emit({})
+            if self.is_running:
+                self.finished.emit({})
             return
 
         for i, frame_path in enumerate(self.frame_paths):
             if not self.is_running:
                 logger.warning("YOLO worker was stopped prematurely.")
                 break
-                
+
             try:
                 # التأكد من استخدام يولو مودل انستانس وليس البايبلاين كله
                 detections = detect_objects(frame_path, yolo_model_instance, conf_threshold=0.10)
                 yolo_results[frame_path] = detections
             except Exception as e:
                 logger.error(f"Error during YOLO detection for {frame_path}: {e}", exc_info=True)
-                
+
             progress_percent = int((i + 1) / total_frames * 100)
             self.progress.emit(progress_percent)
 
@@ -104,6 +110,7 @@ class YOLOWorker(QObject):
 
     def stop(self):
         self.is_running = False
+
 
 class FinalProcessorWorker(QObject):
     progress = Signal(int)
@@ -120,93 +127,117 @@ class FinalProcessorWorker(QObject):
         char_name_safe = sanitize_filename(self.main_window.project.character_name)
         temp_processed_folder = os.path.join("temp", char_name_safe, "processed_assets")
         ensure_folder(temp_processed_folder)
-        
+
         # [MODIFIED] تعريف مسارات التدريب الجديدة (Train/Val)
-        base_cnn_path = self.main_window.config.get("training", {}).get("cnn_data_dir", "assets/cnn_training_data")
+        base_cnn_path = self.main_window.config.get("training", {}).get(
+            "cnn_data_dir", "assets/cnn_training_data"
+        )
         train_data_dir = os.path.join(base_cnn_path, "train")
         val_data_dir = os.path.join(base_cnn_path, "val")
-        
+
         ensure_folder(train_data_dir)
         ensure_folder(val_data_dir)
-        
+
         # استعادة إعدادات التدريب والمقاسات من النسخة الصحيحة
-        tm = self.main_window.tag_manager # تم إضافتها لضمان التوافق مع الكود السابق
-        
-        target_sizes = self.main_window.config.get('image', {}).get('target_sizes', {})
-        clothing_sizes = self.main_window.config.get('image', {}).get('clothing_dimensions', {})
-        transparent_targets = self.main_window.config.get('image', {}).get('transparent_targets', [])
+        tm = self.main_window.tag_manager  # تم إضافتها لضمان التوافق مع الكود السابق
+
+        target_sizes = self.main_window.config.get("image", {}).get("target_sizes", {})
+        clothing_sizes = self.main_window.config.get("image", {}).get("clothing_dimensions", {})
+        transparent_targets = self.main_window.config.get("image", {}).get(
+            "transparent_targets", []
+        )
 
         instruction_count = len(self.instructions)
         if instruction_count == 0:
-            self.finished.emit([]); return
-            
+            self.finished.emit([])
+            return
+
         processed_count = 0
         filename_counters = {}
 
         for frame_path, items_to_create in self.instructions.items():
-            if not self.is_running: break
+            if not self.is_running:
+                break
             try:
                 source_image = cv2.imread(frame_path)
-                if source_image is None: continue
+                if source_image is None:
+                    continue
 
                 for item_data in items_to_create:
-                    yolo_detection = item_data.get('yolo_detection')
-                    if not yolo_detection: continue
-                    
+                    yolo_detection = item_data.get("yolo_detection")
+                    if not yolo_detection:
+                        continue
+
                     # استعادة استخراج البيانات الأساسية
-                    final_class = item_data.get('final_class')
-                    base_type = item_data.get('base_type')
-                    asset_category = item_data.get('asset_category')
-                    base_type_tag = item_data.get('base_type_tag')
-                    final_class_tag = item_data.get('final_class_tag')
+                    final_class = item_data.get("final_class")
+                    base_type = item_data.get("base_type")
+                    asset_category = item_data.get("asset_category")
+                    base_type_tag = item_data.get("base_type_tag")
+                    final_class_tag = item_data.get("final_class_tag")
 
                     # 1. الاقتصاص (Crop)
-                    bbox = yolo_detection['bbox']
+                    bbox = yolo_detection["bbox"]
                     # تصحيح عملية التقريب والاقتصاص لتجنب الأخطاء
                     x1, y1, x2, y2 = [int(coord) for coord in bbox]
                     cropped_img = source_image[y1:y2, x1:x2]
-                    if cropped_img.size == 0: continue
-                    
+                    if cropped_img.size == 0:
+                        continue
+
                     # 2. حفظ بيانات التدريب (Training Data) - التعديل هنا
-                    if asset_category in ['clothing', 'bodypart', 'fullbody']:
+                    if asset_category in ["clothing", "bodypart", "fullbody"]:
                         # تأكد من أن final_class ليس None أو فارغاً قبل محاولة Split
                         if not final_class or not isinstance(final_class, str):
-                            logger.warning(f"Skipping training data save: final_class is invalid/missing for {frame_path}")
+                            logger.warning(
+                                f"Skipping training data save: final_class is invalid/missing for {frame_path}"
+                            )
                             continue
-                            
+
                         try:
                             # 90% train, 10% val (230/256 ≈ 0.90)
-                            target_base_dir = train_data_dir if os.urandom(1)[0] < 230 else val_data_dir
-                            
+                            target_base_dir = (
+                                train_data_dir if os.urandom(1)[0] < 230 else val_data_dir
+                            )
+
                             # استخدام أول جزء من الفئة كاسم للمجلد (لتبسيط التصنيف)
-                            category_name = sanitize_filename(final_class.split('_')[0])
-                            
+                            category_name = sanitize_filename(final_class.split("_")[0])
+
                             training_class_folder = os.path.join(target_base_dir, category_name)
                             ensure_folder(training_class_folder)
-                            
-                            training_file_name = f"{char_name_safe}_{Path(frame_path).stem}_{final_class}.png"
-                            cv2.imwrite(os.path.join(training_class_folder, training_file_name), cropped_img)
-                            
+
+                            training_file_name = (
+                                f"{char_name_safe}_{Path(frame_path).stem}_{final_class}.png"
+                            )
+                            cv2.imwrite(
+                                os.path.join(training_class_folder, training_file_name), cropped_img
+                            )
+
                         except Exception as e:
-                            logger.error(f"Failed to save training data for category '{category_name}' from '{frame_path}': {e}", exc_info=True)
-                            
+                            logger.error(
+                                f"Failed to save training data for category '{category_name}' from '{frame_path}': {e}",
+                                exc_info=True,
+                            )
+
                     # 3. معالجة وتغيير حجم الصورة
                     # استعادة منطق تحديد base_name
-                    base_name = final_class_tag if final_class_tag else sanitize_filename(final_class)
+                    base_name = (
+                        final_class_tag if final_class_tag else sanitize_filename(final_class)
+                    )
 
                     image_to_save = cropped_img
                     target_size_tuple = None
-                    
+
                     # تحديد المقاس المستهدف
-                    if base_type_tag in clothing_sizes: 
+                    if base_type_tag in clothing_sizes:
                         target_size_tuple = tuple(clothing_sizes[base_type_tag])
-                    elif base_type_tag in target_sizes: 
+                    elif base_type_tag in target_sizes:
                         target_size_tuple = tuple(target_sizes[base_type_tag])
-                    
+
                     # تطبيق تغيير الحجم
                     if target_size_tuple:
-                        image_to_save = cv2.resize(cropped_img, target_size_tuple, interpolation=cv2.INTER_LANCZOS4)
-                    
+                        image_to_save = cv2.resize(
+                            cropped_img, target_size_tuple, interpolation=cv2.INTER_LANCZOS4
+                        )
+
                     # إزالة الخلفية (يجب أن تكون آخر خطوة)
                     if base_type_tag in transparent_targets:
                         image_to_save = remove_background(image_to_save)
@@ -218,29 +249,29 @@ class FinalProcessorWorker(QObject):
                         counter += 1
                         final_filename = f"{base_name}_{counter}.png"
                     filename_counters[base_name] = counter + 1
-                    
+
                     final_path = os.path.join(temp_processed_folder, final_filename)
-                    cv2.imwrite(final_path, image_to_save) # cv2.imwrite يحفظ BGR/BGRA بشكل صحيح
-                    
+                    cv2.imwrite(final_path, image_to_save)  # cv2.imwrite يحفظ BGR/BGRA بشكل صحيح
+
                     asset_to_export = {
-                        'path': final_path, 
-                        'final_name': final_filename,
-                        'asset_category': asset_category, 
-                        'base_type': base_type_tag,
-                        'yolo_detection': yolo_detection
+                        "path": final_path,
+                        "final_name": final_filename,
+                        "asset_category": asset_category,
+                        "base_type": base_type_tag,
+                        "yolo_detection": yolo_detection,
                     }
 
                     # [NEW FIX] إضافة مكونات مسار الملابس لتمريرها إلى media_exporter.py
-                    if asset_category == 'clothing':
+                    if asset_category == "clothing":
                         # نعتمد على وجود هذه المفاتيح في item_data التي جاءت من واجهة المستخدم
-                        asset_to_export['body_part_cover'] = item_data.get('body_part_cover', '') 
-                        asset_to_export['cover_type'] = item_data.get('cover_type', '') 
-                        
+                        asset_to_export["body_part_cover"] = item_data.get("body_part_cover", "")
+                        asset_to_export["cover_type"] = item_data.get("cover_type", "")
+
                     final_processed_images.append(asset_to_export)
-                    
+
             except Exception as e:
                 logger.error(f"Error processing item from {frame_path}: {e}", exc_info=True)
-            
+
             processed_count += 1
             self.progress.emit(int(processed_count / instruction_count * 100))
 
@@ -250,27 +281,35 @@ class FinalProcessorWorker(QObject):
     def stop(self):
         self.is_running = False
 
+
 class ExportWorker(QObject):
     finished = Signal(object)
+
     def __init__(self, project, pipeline):
         super().__init__()
         self.project = project
         self.pipeline = pipeline
         self.is_running = True
+
     def run(self):
         try:
             # تم التأكيد: مسؤولية تصدير كل شيء تقع على media_exporter.export_media_pack
-            result_path = media_exporter.export_media_pack(project=self.project, pipeline=self.pipeline)
+            result_path = media_exporter.export_media_pack(
+                project=self.project, pipeline=self.pipeline
+            )
             self.finished.emit(result_path)
         except Exception as e:
             logger.error(f"Critical error in ExportWorker: {e}", exc_info=True)
             self.finished.emit(None)
+
     def stop(self):
         self.is_running = False
+
 
 class VideoSplitterWorker(QObject):
     finished = Signal(dict)
     progress = Signal(int)
+
     def __init__(self, video_path, output_folder, clips, pipeline):
         super().__init__()
         self.video_path = video_path
@@ -283,17 +322,19 @@ class VideoSplitterWorker(QObject):
         self.current_clip_index = 0
         self.total_clips = 0
         self._is_running = True
-        
+
     def run(self):
         self.created_files = {}
-        self.commands_to_run = get_ffmpeg_split_commands(self.video_path, self.output_folder, self.clips)
+        self.commands_to_run = get_ffmpeg_split_commands(
+            self.video_path, self.output_folder, self.clips
+        )
         self.total_clips = len(self.commands_to_run)
         if not self.commands_to_run:
             logger.warning("No valid commands for video splitting.")
             self.finished.emit({})
             return
         self._start_next_process()
-        
+
     def _start_next_process(self):
         if not self._is_running or self.current_clip_index >= self.total_clips:
             self.finished.emit(self.created_files)
@@ -304,16 +345,17 @@ class VideoSplitterWorker(QObject):
         self.process = QProcess(self)
         self.process.finished.connect(self._on_process_finished)
         self.process.start(executable, args)
-        
+
     def _on_process_finished(self, exit_code, exit_status):
-        if not self._is_running: return
+        if not self._is_running:
+            return
         output_path = self.commands_to_run[self.current_clip_index][1]
-        
+
         # 1. التحقق من نجاح عملية FFmpeg
         if exit_status == QProcess.ExitStatus.NormalExit and exit_code == 0:
-            
+
             # تم إزالة استدعاء دالة create_thumbnail_from_video الغير معرفة
-            
+
             # 2. تحليل الذكاء الاصطناعي (AI Analysis)
             try:
                 cap = cv2.VideoCapture(output_path)
@@ -321,20 +363,31 @@ class VideoSplitterWorker(QObject):
                 cap.release()
                 if success and frame is not None:
                     action_suggestion = self.pipeline.suggest_action(frame)
-                    self.created_files[output_path] = {'ai_suggestion': action_suggestion, 'source_path': output_path}
+                    self.created_files[output_path] = {
+                        "ai_suggestion": action_suggestion,
+                        "source_path": output_path,
+                    }
                 else:
-                    self.created_files[output_path] = {'ai_suggestion': 'unknown', 'source_path': output_path}
+                    self.created_files[output_path] = {
+                        "ai_suggestion": "unknown",
+                        "source_path": output_path,
+                    }
             except Exception as e:
                 logger.error(f"AI analysis failed for clip {output_path}: {e}")
-                self.created_files[output_path] = {'ai_suggestion': 'unknown', 'source_path': output_path}
+                self.created_files[output_path] = {
+                    "ai_suggestion": "unknown",
+                    "source_path": output_path,
+                }
         else:
-            error_output = self.process.readAllStandardError().data().decode('utf-8', 'ignore')
-            logger.error(f"Failed to create clip {self.current_clip_index + 1}. Stderr: {error_output}")
-            
+            error_output = self.process.readAllStandardError().data().decode("utf-8", "ignore")
+            logger.error(
+                f"Failed to create clip {self.current_clip_index + 1}. Stderr: {error_output}"
+            )
+
         self.progress.emit(int(((self.current_clip_index + 1) / self.total_clips) * 100))
         self.current_clip_index += 1
         self._start_next_process()
-        
+
     def stop(self):
         self._is_running = False
         if self.process and self.process.state() == QProcess.ProcessState.Running:

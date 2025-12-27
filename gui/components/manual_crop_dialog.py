@@ -4,8 +4,10 @@ from PySide6.QtWidgets import QDialog, QVBoxLayout, QLabel, QDialogButtonBox, QW
 from PySide6.QtGui import QPixmap, QPainter, QPen, QBrush, QColor
 from PySide6.QtCore import Qt, QRect, QPoint
 
+
 class CropArea(QLabel):
     """A custom QLabel that allows drawing a selection rectangle."""
+
     def __init__(self, pixmap, parent=None):
         super().__init__(parent)
         self.setPixmap(pixmap)
@@ -37,21 +39,29 @@ class CropArea(QLabel):
         self.rect = QRect(self.begin, self.end).normalized()
         self.update()
 
+
 class ManualCropDialog(QDialog):
     def __init__(self, image_path, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Manual Crop Tool - Draw a box on the image")
-        
+
         self.original_pixmap = QPixmap(image_path)
         # Scale image for display to ensure it fits on screen
-        scaled_pixmap = self.original_pixmap.scaled(1280, 720, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
-        
+        scaled_pixmap = self.original_pixmap.scaled(
+            1280,
+            720,
+            Qt.AspectRatioMode.KeepAspectRatio,
+            Qt.TransformationMode.SmoothTransformation,
+        )
+
         self.crop_area = CropArea(scaled_pixmap)
-        
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel
+        )
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
-        
+
         layout = QVBoxLayout(self)
         layout.addWidget(self.crop_area)
         layout.addWidget(buttons)
@@ -62,7 +72,12 @@ class ManualCropDialog(QDialog):
         drawn_rect = self.crop_area.rect
         scaled_pixmap = self.crop_area.pixmap()
 
-        if not scaled_pixmap or scaled_pixmap.isNull() or scaled_pixmap.width() == 0 or scaled_pixmap.height() == 0:
+        if (
+            not scaled_pixmap
+            or scaled_pixmap.isNull()
+            or scaled_pixmap.width() == 0
+            or scaled_pixmap.height() == 0
+        ):
             return QRect()
 
         # Calculate the scaling factor
@@ -74,5 +89,5 @@ class ManualCropDialog(QDialog):
         original_y = int(drawn_rect.y() * scale_y)
         original_width = int(drawn_rect.width() * scale_x)
         original_height = int(drawn_rect.height() * scale_y)
-        
+
         return QRect(original_x, original_y, original_width, original_height)

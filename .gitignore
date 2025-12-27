@@ -25,6 +25,21 @@ Thumbs.db
 # Media / temporary files
 *.tmp
 *.bak
+temp/
+output/
+game/
+assets/
+
+# Build files
+dist/
+build/
+*.exe
+*.spec
+
+# Test files
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Python specific
 *.pyc
@@ -37,3 +52,6 @@ Thumbs.db
 *.env
 *.key
 *.pem
+
+# AI models (if large, but keep for now)
+# ai/models/*.pth (uncomment if needed)

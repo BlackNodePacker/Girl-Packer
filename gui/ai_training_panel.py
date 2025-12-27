@@ -1,22 +1,27 @@
 ﻿# GameMediaTool/gui/ai_training_panel.py (File 52 - Fully Functional)
 
 import os
-# [MIGRATION] Switched to PySide6
-import os
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QGroupBox, QPushButton, QLabel, QMessageBox, QProgressDialog
+from PySide6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QGroupBox,
+    QPushButton,
+    QLabel,
+    QMessageBox,
+    QProgressDialog,
+)
 from PySide6.QtCore import Signal, QThread, Qt, QObject
-
-from ai.trainer import TrainerManager
-from tools.logger import get_logger
 
 from ai.trainer import TrainerManager
 from tools.logger import get_logger
 
 logger = get_logger("AITrainingPanel")
 
+
 class TrainingWorker(QObject):
     """A worker to run the training process in a separate thread."""
-    finished = Signal(bool, str) # Emits success status and a message
+
+    finished = Signal(bool, str)  # Emits success status and a message
 
     def __init__(self, training_mode, config=None):
         super().__init__()
@@ -27,12 +32,15 @@ class TrainingWorker(QObject):
     def run(self):
         logger.info(f"TrainingWorker started for mode: {self.training_mode}")
         try:
-            if self.training_mode == 'all':
+            if self.training_mode == "all":
                 success = self.trainer.train_all_models()
                 if success:
                     self.finished.emit(True, "All models trained successfully!")
                 else:
-                    self.finished.emit(False, "Training was skipped or failed. Check logs for details (e.g., missing train/val folders).")
+                    self.finished.emit(
+                        False,
+                        "Training was skipped or failed. Check logs for details (e.g., missing train/val folders).",
+                    )
             # Add other modes here if needed later (e.g., 'yolo', 'cnn_action')
             else:
                 self.finished.emit(False, f"Unknown training mode: {self.training_mode}")
@@ -41,25 +49,26 @@ class TrainingWorker(QObject):
             logger.error(f"An error occurred during training: {e}", exc_info=True)
             self.finished.emit(False, f"A critical error occurred: {e}")
 
+
 class AITrainingPanel(QWidget):
     back_to_dashboard = Signal()
-    review_data_requested = Signal() # This remains for navigation
+    review_data_requested = Signal()  # This remains for navigation
 
     def __init__(self, main_window, parent=None):
         super().__init__(parent)
-        self.main_window = main_window 
+        self.main_window = main_window
         self.training_thread = None
         self.training_worker = None
 
         main_layout = QVBoxLayout(self)
-        
+
         title = QLabel("🧠 AI Training Center")
         title.setObjectName("TitleLabel")
         main_layout.addWidget(title)
 
         steps_group = QGroupBox("Training Workflow")
         steps_layout = QVBoxLayout(steps_group)
-        
+
         # We will simplify this to a single, powerful button
         self.train_all_button = QPushButton("🚀 Train/Update All Models")
         self.train_all_button.setToolTip(
@@ -74,9 +83,9 @@ class AITrainingPanel(QWidget):
         steps_layout.addWidget(self.train_all_button)
         steps_layout.addWidget(self.review_data_button)
         main_layout.addWidget(steps_group)
-        
+
         main_layout.addStretch()
-        
+
         back_button = QPushButton("⬅️ Back to Dashboard")
         main_layout.addWidget(back_button)
 
@@ -86,25 +95,31 @@ class AITrainingPanel(QWidget):
         self.review_data_button.clicked.connect(self.review_data_requested.emit)
 
     def start_training(self):
-        reply = QMessageBox.question(self, "Confirm Training",
-                                     "This will start the AI training process using data in the designated training folders. This may take a while and consume significant system resources.\n\nAre you sure you want to proceed?",
-                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No, QMessageBox.StandardButton.No)
+        reply = QMessageBox.question(
+            self,
+            "Confirm Training",
+            "This will start the AI training process using data in the designated training folders. This may take a while and consume significant system resources.\n\nAre you sure you want to proceed?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+            QMessageBox.StandardButton.No,
+        )
 
         if reply == QMessageBox.StandardButton.No:
             return
 
-        self.progress_dialog = QProgressDialog("Training AI models... Please wait.", "Cancel", 0, 0, self)
+        self.progress_dialog = QProgressDialog(
+            "Training AI models... Please wait.", "Cancel", 0, 0, self
+        )
         self.progress_dialog.setWindowModality(Qt.WindowModality.WindowModal)
         self.progress_dialog.setWindowTitle("AI Training in Progress")
         self.progress_dialog.show()
-        
+
         self.training_thread = QThread()
-        self.training_worker = TrainingWorker(training_mode='all', config=self.main_window.config)
+        self.training_worker = TrainingWorker(training_mode="all", config=self.main_window.config)
         self.training_worker.moveToThread(self.training_thread)
 
         self.training_thread.started.connect(self.training_worker.run)
         self.training_worker.finished.connect(self.on_training_finished)
-        
+
         # Cleanup connections
         self.training_worker.finished.connect(self.training_thread.quit)
         self.training_worker.finished.connect(self.training_worker.deleteLater)

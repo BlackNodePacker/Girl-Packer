@@ -31,14 +31,20 @@ class Pipeline:
 
         # Load all models
         self.yolo_model = self._load_yolo_model(YOLO_MODEL_PATH)
-        self.asset_classifier, self.asset_class_map = self._load_cnn_model(ASSET_MODEL_PATH, ASSET_CLASS_MAP_PATH, "Asset Classifier")
-        self.action_classifier, self.action_class_map = self._load_cnn_model(ACTION_MODEL_PATH, ACTION_CLASS_MAP_PATH, "Action Classifier")
+        self.asset_classifier, self.asset_class_map = self._load_cnn_model(
+            ASSET_MODEL_PATH, ASSET_CLASS_MAP_PATH, "Asset Classifier"
+        )
+        self.action_classifier, self.action_class_map = self._load_cnn_model(
+            ACTION_MODEL_PATH, ACTION_CLASS_MAP_PATH, "Action Classifier"
+        )
 
-        self.transform = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Resize((224, 224), antialias=True),
-            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-        ])
+        self.transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Resize((224, 224), antialias=True),
+                transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            ]
+        )
 
     def _load_yolo_model(self, path):
         logger.info(f"Loading YOLO model from {path}...")
@@ -52,12 +58,12 @@ class Pipeline:
     def _load_cnn_model(self, model_path, class_map_path, model_name):
         try:
             logger.info(f"Loading {model_name} class map from {class_map_path}...")
-            with open(class_map_path, 'r') as f:
+            with open(class_map_path, "r") as f:
                 # [THE FIX] Swap the key and value to match the JSON format {class_name: index}
                 # and create a dictionary of {index: class_name}
                 json_data = json.load(f)
                 class_map = {int(v): k for k, v in json_data.items()}
-            
+
             num_classes = len(class_map)
             logger.info(f"Loading {model_name} model for {num_classes} classes...")
             model = create_pytorch_model(num_classes)
@@ -73,7 +79,7 @@ class Pipeline:
     def classify_asset(self, image: np.ndarray) -> str:
         if self.asset_classifier is None:
             return "unknown_asset"
-            
+
         with torch.no_grad():
             image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
             tensor = self.transform(image_rgb).unsqueeze(0).to(self.device)
