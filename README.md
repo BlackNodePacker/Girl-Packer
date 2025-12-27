@@ -10,6 +10,8 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
 - **Event Maker**: Generate Ren'Py events with dialogue and scripts.
 - **AI Training**: Retrain models on new data.
 - **Data Review**: Review and manage training data.
+- **Pack Review and Rating**: Analyze completed packs for quality, errors, and rating before export (integrated with PackAnalyzer).
+- **Auto-Pack (Pro Users)**: Automated pack creation from raw media using AI workflows (requires pro verification via Patreon key).
 
 ## Installation
 
@@ -76,6 +78,25 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
 1. Go to "AI Training" panel.
 2. Add new training data.
 3. Retrain models.
+
+### Pack Review and Rating
+1. Before exporting, access the "Pack Review" panel.
+2. Select the pack folder to analyze.
+3. View rating (0-100), positives, warnings, and errors.
+4. Inspect media files and adjust as needed.
+5. Proceed to export once satisfied.
+
+### Auto-Pack for Pro Users
+1. Subscribe via Patreon (patreon.com/girlpacker) or GitHub Sponsors at the repository.
+2. Receive your license key automatically via email after subscription.
+3. Enable pro mode in settings.
+4. Select "Auto-Pack" panel.
+5. Paste the license key into the "Pro Activation" dialog and click "Activate" (internet required for verification).
+6. Choose pack type: Min (basic), Mid (moderate), or Top (comprehensive).
+7. Select source media folder with raw assets and multiple long videos.
+8. Check components to extract: bodyparts, clothing, events, photoshoots (from frames), video shoots (from split clips), fullbody pics.
+9. Run automated processing: AI detection, cropping, tagging, config generation.
+10. Review and export the completed pack.
 
 ### Configuration
 Edit `config.yaml` for:
@@ -164,6 +185,8 @@ build.bat clean
 - Follow PEP8.
 - Add tests for new features.
 - Update documentation.
+
+See `todo_plan.md` for current development roadmap and upcoming features.
 
 ## License
 

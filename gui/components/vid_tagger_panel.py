@@ -96,15 +96,15 @@ class VidTaggerPanel(QWidget):
         main_layout.addLayout(tag_lists_hbox)
 
         bottom_grid = QGridLayout()
-        corruption_widget, self.corruption_combo = self._create_combo(
-            "Corruption:", [""] + list(self.vid_tag_options.get("corruption_level", {}).keys())
+        corruption_widget, self.corruption_list = self._create_tag_list_widget(
+            "Corruption:", self.vid_tag_options.get("corruption_level", {})
         )
-        participants_widget, self.participants_combo = self._create_combo(
-            "Participants:", [""] + list(self.vid_tag_options.get("participants", {}).keys())
+        participants_widget, self.participants_list = self._create_tag_list_widget(
+            "Participants:", self.vid_tag_options.get("participants", {})
         )
-        # [MODIFIED] Populate location combo from the new unified source
-        location_widget, self.location_combo = self._create_combo(
-            "Location:", [""] + list(self.shoots_tags.get("location_tags", {}).keys())
+        # [MODIFIED] Populate location list from the new unified source
+        location_widget, self.location_list = self._create_tag_list_widget(
+            "Location:", self.shoots_tags.get("location_tags", {})
         )
 
         bottom_grid.addWidget(corruption_widget, 0, 0)
@@ -132,27 +132,24 @@ class VidTaggerPanel(QWidget):
         layout = QVBoxLayout(group)
         list_widget = QListWidget()
         list_widget.setSelectionMode(QListWidget.ExtendedSelection)
-        for category, items in data.items():
-            cat_item = QListWidgetItem(f"=={category}==")
-            cat_item.setFlags(cat_item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
-            list_widget.addItem(cat_item)
-            for name, tag in items.items():
-                item = QListWidgetItem(name)
-                item.setData(Qt.UserRole, tag)
-                list_widget.addItem(item)
+        if isinstance(data, dict):
+            for category, items in data.items():
+                if isinstance(items, dict):
+                    # Nested dict like main_tags
+                    cat_item = QListWidgetItem(f"=={category}==")
+                    cat_item.setFlags(cat_item.flags() & ~Qt.ItemFlag.ItemIsSelectable)
+                    list_widget.addItem(cat_item)
+                    for name, tag in items.items():
+                        item = QListWidgetItem(name)
+                        item.setData(Qt.UserRole, tag)
+                        list_widget.addItem(item)
+                else:
+                    # Flat dict like corruption_level
+                    item = QListWidgetItem(category)
+                    item.setData(Qt.UserRole, items)
+                    list_widget.addItem(item)
         layout.addWidget(list_widget)
         return group, list_widget
-
-    def _create_combo(self, label_text, items):
-        widget = QWidget()
-        layout = QHBoxLayout(widget)
-        layout.setContentsMargins(0, 0, 0, 0)
-        label = QLabel(label_text)
-        combo = QComboBox()
-        combo.addItems(items)
-        layout.addWidget(label)
-        layout.addWidget(combo)
-        return widget, combo
 
     def _connect_signals(self):
         self.clips_list_widget.currentRowChanged.connect(self.play_selected_clip)
@@ -160,15 +157,13 @@ class VidTaggerPanel(QWidget):
             self.main_tags_list,
             self.clothing_main_tags_list,
             self.clothing_tags_list,
-            self.corruption_combo,
-            self.participants_combo,
-            self.location_combo,
+            self.corruption_list,
+            self.participants_list,
+            self.location_list,
         ]
         for control in all_controls:
             if isinstance(control, QListWidget):
                 control.itemSelectionChanged.connect(self.update_suggested_filename)
-            elif isinstance(control, QComboBox):
-                control.currentTextChanged.connect(self.update_suggested_filename)
         for chk in [
             self.only_suffix_check,
             self.not_prefix_check,
@@ -194,17 +189,9 @@ class VidTaggerPanel(QWidget):
         if self.lesbian_prefix_check.isChecked():
             main_tag_str = "lesbian_" + main_tag_str
         sub_tags = {item.data(Qt.UserRole) for item in self.clothing_tags_list.selectedItems()}
-        if self.corruption_combo.currentIndex() > 0:
-            sub_tags.add(
-                self.vid_tag_options["corruption_level"][self.corruption_combo.currentText()]
-            )
-        if self.participants_combo.currentIndex() > 0:
-            sub_tags.add(
-                self.vid_tag_options["participants"][self.participants_combo.currentText()]
-            )
-        # [MODIFIED] Get location tag from the new unified source
-        if self.location_combo.currentIndex() > 0:
-            sub_tags.add(self.shoots_tags["location_tags"][self.location_combo.currentText()])
+        sub_tags.update({item.data(Qt.UserRole) for item in self.corruption_list.selectedItems()})
+        sub_tags.update({item.data(Qt.UserRole) for item in self.participants_list.selectedItems()})
+        sub_tags.update({item.data(Qt.UserRole) for item in self.location_list.selectedItems()})
         sub_tag_list = sorted(list(sub_tags))
         if self.only_suffix_check.isChecked():
             sub_tag_list = [f"{tag}_only" for tag in sub_tag_list]
@@ -245,10 +232,8 @@ class VidTaggerPanel(QWidget):
         return {path: data for path, data in self.clips_data.items() if "final_filename" in data}
 
     def reset_all_tags(self):
-        for lst in [self.main_tags_list, self.clothing_main_tags_list, self.clothing_tags_list]:
+        for lst in [self.main_tags_list, self.clothing_main_tags_list, self.clothing_tags_list, self.corruption_list, self.participants_list, self.location_list]:
             lst.clearSelection()
-        for cmb in [self.corruption_combo, self.participants_combo, self.location_combo]:
-            cmb.setCurrentIndex(0)
         for chk in [
             self.only_suffix_check,
             self.not_prefix_check,

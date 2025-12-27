@@ -35,7 +35,7 @@ def get_data_files():
 
 setup(
     name="girl-packer",
-    version="1.0.0",
+    version="1.1.0",
     description="PySide6-based GUI tool for processing media assets into Ren'Py game content",
     author="Ahmed Asker",
     author_email="ahmedasker115@gmail.com",

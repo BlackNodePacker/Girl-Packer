@@ -1,0 +1,107 @@
+# Guide to Creating Character Packs for Ren'Py Visual Novel Games
+
+This guide organizes the process of creating character packs (referred to as "girl packs" in the source material) for games like Summertime Saga. It focuses on technical setup, media preparation, and integration, while avoiding explicit content. The guide is divided into steps for clarity. At the end, packs are rated into three tiers (top, mid, min) based on completeness and quality, with a maximum score of 100. Suitable media quantities are specified for each tier.
+
+## 1. Project Setup and Folder Structure
+- Create a folder named after the character (e.g., `character_name`) inside `game/_mods/girls/`.
+- Subfolders: `body_images/`, `fullbody/`, `vids/`, `shoots/` (for photo/video shoots), `clothing/` (optional), `events/` (optional).
+- Use absolute paths and ensure all media is in .webp format (convert using tools like GIMP or online converters).
+- Recommended tools: Visual Studio Code for editing JSON/RPY, GIMP for image editing, FFmpeg for video processing.
+
+## 2. Character Configuration (girl_config.json)
+This JSON file defines the character's identity and attributes. Place it in the root of the character's folder.
+
+- **Required Fields**:
+  - `id`: Unique identifier (e.g., "character_name" – lowercase, underscore for spaces).
+  - `first_name` and `last_name`: Self-explanatory.
+  - `area_sensitivity`: Object with body part modifiers (e.g., `{"breasts": 1.5}` for adjustments; leave empty for random).
+  - `traits`: Array of traits (e.g., `["blonde_hair", "blue_eyes", "big_boobs"]`). Include hair color, eye color, body size, and race if non-white. Use `generate_additional_traits: true` for random extras.
+  - `modder`: Your username.
+
+- **Example**:
+  ```json
+  {
+    "id": "character_name",
+    "first_name": "First",
+    "last_name": "Last",
+    "area_sensitivity": {"breasts": 1.2},
+    "traits": ["blonde_hair", "blue_eyes", "big_boobs"],
+    "generate_additional_traits": true,
+    "modder": "your_username"
+  }
+  ```
+
+- **Tips**: For mothers, use `mother_config.json` with optional `daughter_id`. Ensure traits match the character's appearance.
+
+## 3. Body Images (Essential Media)
+These are close-up images of body parts, used in interactions. All in .webp, transparent backgrounds where possible.
+
+- **Required Types and Dimensions**:
+  - `portrait/tportrait`: 350x350 (tportrait for topless variants).
+  - `face`: 500x500.
+  - `boobs`: 495x240 (aspect ratio ~2.06:1).
+  - `pussy`: 245x235 (aspect ratio ~1.04:1).
+  - `ass`: 495x240 (aspect ratio ~2.06:1).
+  - `legs`: 245x235 (aspect ratio ~1.04:1).
+
+- **Preparation**: Resize and crop in GIMP. Ensure no distortion; pad if needed. Portrait/tportrait should be transparent.
+
+## 4. Fullbody Images (Essential Media)
+Full-body images for scenes. Transparent backgrounds, at least 1500px high.
+
+- **Required Types**: `bare`, `bikini`, `clothed`, `topless`, `underwear`. Add others like `shower`, `maid` if available.
+- **Preparation**: Trim to minimal borders. Avoid backgrounds.
+
+## 5. Videos (Vids) – Core Content
+Videos for actions. Convert to .webm, ~10-20 seconds, 720p+.
+
+- **Tagging Process** (Use Mod Tools Video Tagger):
+  - Select main action (e.g., "action_type").
+  - Add sub-tags: Clothing (e.g., "bra", "bottomless"), levels (e.g., "high_level"), participants (e.g., "group"), location (e.g., "class"), etc.
+  - Options: Suffixes for requirements, prefixes for exclusions, special variants for climax or group scenes.
+
+- **Essential Main Tags**: Core actions like interactions with body parts, basic scenes.
+- **Preparation**: Source and cut clips in FFmpeg. Ensure tags match context.
+
+## 6. Photo and Video Shoots (Optional but Recommended)
+Shoots for unlockable content. Use Mod Tools Shoot Helper.
+
+- **Config**: Choose type (solo/group photo/video). Set name, display name, cost (100), requirements, tags (e.g., "athletic").
+- **Photos**: Wide (1920x1080+), convert to .webp, resize. Tag with actions and sub-tags.
+- **Videos**: Generate thumbnails; number for tagging.
+- **Cover**: Select a wide item, rename to `cover.webp`.
+
+## 7. Advanced Features
+- **Clothing**: Optional custom images for outfits (e.g., `clothing/boobs_cover/bra/` with matching dimensions).
+- **Events**: Optional Ren'Py scripts for special scenes (requires coding knowledge; test thoroughly).
+
+## 8. Testing and Deployment
+- Install pack in `game/_mods/girls/`.
+- Use in-game ratings tool to check for issues (e.g., missing tags, compression).
+- Zip the folder and share.
+
+## Pack Rating Tiers
+Packs are scored out of 100 based on completeness, quality, and variety. Here's a breakdown into three tiers with suitable media quantities:
+
+- **Top Rated Packs (80-100 points)**: Comprehensive, high-quality packs with extensive media, advanced features, and minimal errors. Ideal for detailed character representation.
+  - Body Images: 10-15 per type (e.g., 10 portraits, 10 faces, etc.), including variants.
+  - Fullbody Images: 20-30 (all types, with corruption variants).
+  - Videos: 100-200 (covering all main tags, stripping, locations, and special variants).
+  - Shoots: 6-10 photo shoots (20-30 photos each), 4-6 video shoots (10-20 videos each).
+  - Advanced: Full clothing sets and 2-5 custom events.
+
+- **Mid Rated Packs (50-79 points)**: Moderate quality with good variety, some advanced elements, and acceptable errors. Suitable for balanced gameplay.
+  - Body Images: 5-10 per type (e.g., 5 portraits, 5 faces, etc.).
+  - Fullbody Images: 10-20 (core types like bare, clothed, etc.).
+  - Videos: 50-100 (essential main tags, some stripping and locations).
+  - Shoots: 3-5 photo shoots (10-20 photos each), 2-3 video shoots (5-10 videos each).
+  - Advanced: Partial clothing sets or 1-2 events.
+
+- **Min Rated Packs (0-49 points)**: Basic packs with minimal media, focusing on essentials. Good for quick setups or limited content.
+  - Body Images: 1-5 per type (e.g., 1-2 portraits, 1-2 faces, etc.).
+  - Fullbody Images: 5-10 (core types only).
+  - Videos: 20-50 (basic main tags and stripping).
+  - Shoots: 1-2 photo shoots (5-10 photos each), 0-1 video shoot (3-5 videos).
+  - Advanced: None (optional clothing or events if available).
+
+Aim for higher tiers for better in-game ratings and player experience. Focus on quality over quantity to avoid compression issues.

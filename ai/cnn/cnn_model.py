@@ -134,7 +134,6 @@ def train_pytorch_model(
     logger.info(f"Starting training for {num_epochs} epochs on device: {device}")
 
     for epoch in range(num_epochs):
-        print("-" * 20)
         logger.info(f"Epoch {epoch+1}/{num_epochs}")
 
         for phase in ["train", "val"]:
