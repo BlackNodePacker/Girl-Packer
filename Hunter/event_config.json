@@ -1,0 +1,32 @@
+{
+    "name": "lexi_belle_hunter",
+    "display_name": "Who Is The Hunter",
+    "event_type": ["home_visit"],
+    "participant_ids": ["lexi_belle", "sasha_grey"],
+    "requirements": "'lexi_belle_leashed' in girl.event_tracker and time_manager.hour >= 16",
+    "requirement_description": "Requires: 'On A Leash', after 16:00",
+    "min_chance_to_happen": 20,
+    "max_chance_to_happen": 35,
+    "chance_to_happen_calculation": {
+        "action_requirements": {
+            "corruption": 35, 
+            "affection": 25
+        },
+        "accept_influences": {
+            "corruption": {"weight": 0.45}, 
+            "affection": {"weight": 0.4}, 
+            "fear": {"weight": -0.1}
+        }
+    },
+    "stages": ["lexi_belle_hunter"],
+    "one_time_event": false,
+    "impacts": {
+        "participants": {
+            "impacts": {
+                "corruption": [2000, 3500], "naturism":  [2000, 3500], "affection":  [2000, 3500], "fear": [-3500, -2000]
+            }
+        }
+    },
+    "reset_outfit_when_finished": true,
+	"event_cooldown": 28
+}
