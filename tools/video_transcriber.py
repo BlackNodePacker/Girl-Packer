@@ -1,6 +1,7 @@
 # tools/video_transcriber.py
 
 import os
+import sys
 import subprocess
 import tempfile
 from tools.logger import get_logger
@@ -17,7 +18,12 @@ except ImportError:
     logger.warning("faster-whisper not installed. Transcription disabled.")
 
 # FFmpeg path
-FFMPEG_PATH = "ffmpeg.exe"  # Adjust if needed
+if getattr(sys, "frozen", False):
+    base_dir = sys._MEIPASS
+    FFMPEG_PATH = os.path.join(base_dir, "ffmpeg.exe")
+else:
+    FFMPEG_PATH = "ffmpeg.exe"  # Adjust if needed
+
 
 def extract_audio_from_video(video_path: str, audio_path: str) -> bool:
     """Extract audio from video using FFmpeg."""
@@ -39,6 +45,7 @@ def extract_audio_from_video(video_path: str, audio_path: str) -> bool:
         logger.error(f"Failed to extract audio from {video_path}: {e}")
         return False
 
+
 def transcribe_audio(audio_path: str, model_size: str = "base") -> str:
     """Transcribe audio using faster-whisper."""
     if not FASTER_WHISPER_AVAILABLE:
@@ -54,11 +61,13 @@ def transcribe_audio(audio_path: str, model_size: str = "base") -> str:
         for segment in segments:
             transcription += f"{segment.text}\n"
 
-        logger.info(f"Transcribed {len(segments)} segments")
+        num_segments = sum(1 for _ in segments)
+        logger.info(f"Transcribed {num_segments} segments")
         return transcription.strip()
     except Exception as e:
         logger.error(f"Transcription failed: {e}")
         return ""
+
 
 def transcribe_video(video_path: str, model_size: str = "base") -> str:
     """Full pipeline: extract audio and transcribe."""
@@ -78,6 +87,7 @@ def transcribe_video(video_path: str, model_size: str = "base") -> str:
     finally:
         if os.path.exists(audio_path):
             os.unlink(audio_path)
+
 
 def format_transcription_to_rpy(transcription: str, character_name: str = "character") -> str:
     """Simple formatting of transcription to RPY dialogue lines."""
