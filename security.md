@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this project, please report it by emailing: ahmedasker115@gmail.com
+If you discover a security vulnerability in this project, please report it by emailing: https://discord.com/channels/1454626804039024806/1454637130499358801
 
 ## Supported Versions
 
