@@ -19,3 +19,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Security Notice
+This software is provided for educational and entertainment purposes. Users are responsible for ensuring the security and legality of their use of this software. The authors disclaim any liability for misuse, security vulnerabilities, or any damages resulting from the use of this software. It is recommended to review and audit the code before use in production environments.
