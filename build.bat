@@ -1,22 +1,27 @@
 @echo off
 REM Build script for Girl Packer
-REM Usage: build.bat [nuitka|pyinstaller|setup]
+REM Usage: build.bat [nuitka|pyinstaller|setup|clean]
 
 if "%1"=="nuitka" goto nuitka
 if "%1"=="pyinstaller" goto pyinstaller
 if "%1"=="setup" goto setup
 if "%1"=="clean" goto clean
 
+REM Default to PyInstaller for reliability
+echo No option specified, defaulting to PyInstaller build...
+goto pyinstaller
+
 echo Usage: build.bat [nuitka^|pyinstaller^|setup^|clean]
 echo.
-echo nuitka     - Build with Nuitka (recommended)
-echo pyinstaller- Build with PyInstaller
+echo nuitka     - Build with Nuitka (requires MSVC or MinGW)
+echo pyinstaller- Build with PyInstaller (recommended)
 echo setup      - Install in development mode
 echo clean      - Clean build artifacts
 goto end
 
 :nuitka
 echo Building with Nuitka...
+echo Note: Ensure MSVC (Visual Studio Build Tools) or MinGW is installed for C compilation.
 python build_nuitka.py
 goto end
 

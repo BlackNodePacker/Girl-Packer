@@ -40,16 +40,15 @@ def main():
 
     print("Building Girl Packer with PyInstaller...")
 
-    # Create spec file content
-    spec_content = f'''
+    # Create spec file content (full spec written as a string)
+    spec_content = """
 # -*- mode: python ; coding: utf-8 -*-
 
 import os
 import sys
 from pathlib import Path
 
-# Get the project root
-project_root = Path(__file__).parent
+project_root = Path(r"{project_root}")
 
 a = Analysis(
     ['main.py'],
@@ -116,7 +115,7 @@ exe = EXE(
     entitlements_file=None,
     icon=None,
 )
-'''
+""".format(project_root=str(project_root))
 
     spec_file = project_root / "girl_packer.spec"
     with open(spec_file, 'w') as f:
@@ -130,10 +129,9 @@ exe = EXE(
         str(spec_file)
     ]
 
-    cmd_str = " ".join(pyinstaller_cmd)
-    print(f"Running: {cmd_str}")
+    print(f"Running PyInstaller build...")
 
-    if run_command(cmd_str):
+    if run_command(pyinstaller_cmd):
         print("Build completed successfully!")
         exe_path = dist_dir / "GirlPacker.exe"
         if exe_path.exists():
