@@ -46,14 +46,19 @@ def main():
     # Datas to include: map source -> dest inside bundle
     add_data = [
         (project_root / 'assets', 'assets'),
+        (project_root / 'workflows', 'workflows'),
         (project_root / 'database', 'database'),
         (project_root / 'tools', 'tools'),
         (project_root / 'utils', 'utils'),
         (project_root / 'gui' / 'style.qss', 'gui'),
+        (project_root / 'config.yaml', '.'),
+        (project_root / 'ai', 'ai'),
+    ]
+
+    # Binaries to include
+    add_binaries = [
         (project_root / 'ffmpeg.exe', '.'),
         (project_root / 'ffprobe.exe', '.'),
-        (project_root / 'config.yaml', '.'),
-        (project_root / 'ai' / 'models', os.path.join('ai', 'models')),
     ]
 
     # Hidden imports to help PyInstaller find dynamic imports
@@ -92,6 +97,14 @@ def main():
             pyinstaller_cmd.extend(['--add-data', mapping])
         else:
             print(f"Warning: data source not found, skipping: {src}")
+
+    # Append binary mappings
+    for src, dest in add_binaries:
+        if src.exists():
+            mapping = f"{str(src)}{os.pathsep}{dest}"
+            pyinstaller_cmd.extend(['--add-binary', mapping])
+        else:
+            print(f"Warning: binary source not found, skipping: {src}")
 
     # Append hidden imports
     for hi in hidden_imports:
