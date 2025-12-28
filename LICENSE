@@ -1,24 +1,31 @@
-MIT License
+Girl Packer Proprietary License
+Copyright (c) 2025 Ahmed Asker
 
-Copyright (c) 2025 ahmedasker115-cloud
+All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+This software and its associated files (the "Software") are the exclusive
+property of Ahmed Asker.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+Permission is granted to install and use the Software for personal or
+commercial content creation purposes only.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The following are strictly prohibited without explicit written permission
+from the copyright holder:
 
-## Security Notice
-This software is provided for educational and entertainment purposes. Users are responsible for ensuring the security and legality of their use of this software. The authors disclaim any liability for misuse, security vulnerabilities, or any damages resulting from the use of this software. It is recommended to review and audit the code before use in production environments.
+- Copying, redistributing, or reselling the Software or any part of it
+- Repackaging or bundling the Software with other products
+- Reverse engineering, decompiling, or attempting to extract source code
+- Modifying the Software for redistribution
+- Using the Software to create competing tools or services
+
+Pro Features:
+Certain features (including but not limited to Auto-Pack workflows)
+require a valid license key obtained via official channels (Patreon or
+authorized sellers). License keys are non-transferable.
+
+Disclaimer:
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES ARISING FROM THE USE
+OR INABILITY TO USE THIS SOFTWARE.
+
+By using this Software, you agree to all terms above.
