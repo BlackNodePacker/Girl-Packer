@@ -19,7 +19,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QFrame,
 )
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QTimer
 
 from .player_widget import PlayerWidget
 from tools.logger import get_logger
@@ -45,6 +45,10 @@ class VidTaggerPanel(QWidget):
 
         self._setup_ui()
         self._connect_signals()
+        
+        self.preview_timer = QTimer(self)
+        self.preview_timer.setInterval(100)
+        self.preview_timer.timeout.connect(self.update_preview_ui)
 
     def _setup_ui(self):
         main_layout = QVBoxLayout(self)
@@ -55,8 +59,29 @@ class VidTaggerPanel(QWidget):
         self.clips_list_widget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         clips_layout.addWidget(self.clips_list_widget)
         preview_hbox.addWidget(clips_group, 1)
+        
+        # Preview section with player and controls
+        preview_vbox = QVBoxLayout()
         self.preview_player = PlayerWidget()
-        preview_hbox.addWidget(self.preview_player, 2)
+        self.preview_player.setMinimumSize(400, 300)
+        preview_vbox.addWidget(self.preview_player)
+        
+        # Controls for preview
+        controls_layout = QHBoxLayout()
+        self.preview_play_pause_button = QPushButton("▶")
+        self.preview_stop_button = QPushButton("⏹️")
+        self.preview_rewind_button = QPushButton("⏪")
+        self.preview_forward_button = QPushButton("⏩")
+        self.preview_time_label = QLabel("00:00.00 / 00:00.00")
+        controls_layout.addWidget(self.preview_rewind_button)
+        controls_layout.addWidget(self.preview_play_pause_button)
+        controls_layout.addWidget(self.preview_stop_button)
+        controls_layout.addWidget(self.preview_forward_button)
+        controls_layout.addStretch()
+        controls_layout.addWidget(self.preview_time_label)
+        preview_vbox.addLayout(controls_layout)
+        
+        preview_hbox.addLayout(preview_vbox, 2)
         main_layout.addLayout(preview_hbox)
 
         tag_lists_hbox = QHBoxLayout()
@@ -131,7 +156,7 @@ class VidTaggerPanel(QWidget):
         group = QGroupBox(title)
         layout = QVBoxLayout(group)
         list_widget = QListWidget()
-        list_widget.setSelectionMode(QListWidget.ExtendedSelection)
+        list_widget.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         if isinstance(data, dict):
             for category, items in data.items():
                 if isinstance(items, dict):
@@ -175,6 +200,12 @@ class VidTaggerPanel(QWidget):
         self.back_button.clicked.connect(self.on_back_pressed)
         self.apply_button.clicked.connect(self.apply_tags_to_selected)
         self.export_button.clicked.connect(self.finalize_and_export)
+        
+        # Preview controls
+        self.preview_play_pause_button.clicked.connect(self.on_preview_play_pause)
+        self.preview_stop_button.clicked.connect(self.on_preview_stop)
+        self.preview_rewind_button.clicked.connect(lambda: self.preview_player.seek_video(-5000))
+        self.preview_forward_button.clicked.connect(lambda: self.preview_player.seek_video(5000))
 
     def update_suggested_filename(self):
         main_tags = {item.data(Qt.UserRole) for item in self.main_tags_list.selectedItems()}
@@ -259,7 +290,41 @@ class VidTaggerPanel(QWidget):
         if 0 <= row_index < self.clips_list_widget.count():
             path = self.clips_list_widget.item(row_index).data(Qt.UserRole)
             self.preview_player.load_video(path)
+            self.preview_timer.start()
+
+    def update_preview_ui(self):
+        if self.preview_player and self.preview_player.is_playing():
+            current_ms = self.preview_player.get_time()
+            length_ms = self.preview_player.get_length()
+            current_str = self._format_time(current_ms)
+            length_str = self._format_time(length_ms)
+            self.preview_time_label.setText(f"{current_str} / {length_str}")
+        else:
+            self.preview_timer.stop()
+
+    def _format_time(self, ms):
+        if ms < 0:
+            return "00:00.00"
+        total_seconds = ms / 1000
+        minutes = int(total_seconds // 60)
+        seconds = total_seconds % 60
+        return f"{minutes:02d}:{seconds:05.2f}"
+
+    def on_preview_play_pause(self):
+        self.preview_player.toggle_play_pause()
+        # Ensure timer is managed correctly
+        if self.preview_player.is_playing():
+            self.preview_timer.start()
+        else:
+            self.preview_timer.stop()
+
+    def on_preview_stop(self):
+        self.preview_player.stop_video()
+        self.preview_timer.stop()
+        # Reset time label
+        self.preview_time_label.setText("00:00.00 / 00:00.00")
 
     def on_back_pressed(self):
+        self.preview_timer.stop()
         self.preview_player.release_player()
         self.back_requested.emit()

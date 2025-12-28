@@ -1,6 +1,7 @@
 ﻿# GameMediaTool/ai/pipeline.py (Corrected with json import and logic)
 
 import os
+import sys
 import json
 from typing import Dict, Any
 
@@ -16,11 +17,18 @@ from tools.logger import get_logger
 logger = get_logger("AIPipeline")
 
 # Define model paths
-YOLO_MODEL_PATH = "ai/models/best.pt"
-ASSET_MODEL_PATH = "ai/models/asset_classifier.pth"
-ASSET_CLASS_MAP_PATH = "ai/models/asset_class_map.json"
-ACTION_MODEL_PATH = "ai/models/action_classifier.pth"
-ACTION_CLASS_MAP_PATH = "ai/models/action_class_map.json"
+def get_model_base():
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, 'ai', 'models')
+    else:
+        return os.path.join(os.path.dirname(__file__), 'models')
+
+model_base = get_model_base()
+YOLO_MODEL_PATH = os.path.join(model_base, "best.pt")
+ASSET_MODEL_PATH = os.path.join(model_base, "asset_classifier.pth")
+ASSET_CLASS_MAP_PATH = os.path.join(model_base, "asset_class_map.json")
+ACTION_MODEL_PATH = os.path.join(model_base, "action_classifier.pth")
+ACTION_CLASS_MAP_PATH = os.path.join(model_base, "action_class_map.json")
 
 
 class Pipeline:

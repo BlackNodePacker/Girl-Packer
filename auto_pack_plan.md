@@ -113,3 +113,26 @@ Users can choose from three tiers based on the pack guide (Min, Mid, Top). Each 
 - AI inaccuracies: Allow manual review/override.
 - Performance: Run in background threads.
 - File size: Warn on large outputs.
+
+## Additional Features: Settings Panel
+To enhance user control and customization, implement a comprehensive Settings panel accessible from the main GUI. This panel will allow users to configure various aspects of the application without editing code or config files directly.
+
+### Settings Categories
+- **Theme Selection**: Dropdown or radio buttons to choose from available themes (e.g., Dark Blue, Light, Custom). Apply changes immediately or on restart.
+- **Training Controls**:
+  - Toggle to allow/disallow AI model training (to prevent accidental retraining or for performance reasons).
+  - Button to initiate training of specialized models (e.g., fine-tune on user data for better accuracy).
+- **Tag Management (Most Important)**: GUI editor for tagging JSONs.
+  - Load and display current tags from database/ JSON files (character_traits.json, clothing_definitions.json, etc.).
+  - Allow adding, editing, deleting tags/categories/subcategories.
+  - Tree view or table for hierarchical tag structure.
+  - Save changes back to JSON files with validation.
+  - Import/export tags for backup/sharing.
+- **Other Settings**: App-wide options like logging level, default paths, AI confidence thresholds.
+
+### Implementation
+- **New Panel**: `gui/settings_panel.py` with QTabWidget for different categories.
+- **Integration**: Add "Settings" button/menu in main window.
+- **Persistence**: Save settings to config.yaml or separate settings.json.
+- **Security**: For pro features, restrict access based on license status.
+- **UI/UX**: User-friendly with tooltips, validation messages, and undo options.

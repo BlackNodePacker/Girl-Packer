@@ -382,7 +382,6 @@ class VideoSplitterWorker(QObject):
         # Set process environment and working directory
         env = QProcessEnvironment.systemEnvironment()
         self.process.setProcessEnvironment(env)
-        self.process.setWorkingDirectory(os.path.dirname(executable))
 
         self.process.start(executable, args)
 
@@ -414,12 +413,12 @@ class VideoSplitterWorker(QObject):
         self._handle_process_failure()
 
     def _on_process_stdout(self):
-        stdout = self.process.readAllStandardOutput().data().decode("utf-8", "ignore")
+        stdout = self.process.readAllStandardOutput().data().decode("utf-8", "ignore")  # type: ignore
         if stdout.strip():
             logger.debug(f"FFmpeg stdout: {stdout.strip()}")
 
     def _on_process_stderr(self):
-        stderr = self.process.readAllStandardError().data().decode("utf-8", "ignore")
+        stderr = self.process.readAllStandardError().data().decode("utf-8", "ignore")  # type: ignore
         if stderr.strip():
             logger.debug(f"FFmpeg stderr: {stderr.strip()}")
 
@@ -482,7 +481,7 @@ class VideoSplitterWorker(QObject):
                     "source_path": output_path,
                 }
         else:
-            error_output = self.process.readAllStandardError().data().decode("utf-8", "ignore")
+            error_output = self.process.readAllStandardError().data().decode("utf-8", "ignore")  # type: ignore
             logger.error(
                 f"Failed to create clip {self.current_clip_index + 1}. Exit code: {exit_code}, Stderr: {error_output}"
             )
@@ -493,7 +492,10 @@ class VideoSplitterWorker(QObject):
 
     def stop(self):
         self._is_running = False
-        self.timeout_timer.stop()
+        try:
+            self.timeout_timer.stop()
+        except RuntimeError:
+            pass  # Timer already deleted
         if self.process and self.process.state() == QProcess.ProcessState.Running:
             self.process.finished.disconnect(self._on_process_finished)
             self.process.kill()

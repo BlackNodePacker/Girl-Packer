@@ -8,14 +8,25 @@ logger = get_logger("Main")
 
 if __name__ == "__main__":
     logger.info("Starting Girl Packer application")
+    # Handle frozen executable paths
+    if getattr(sys, 'frozen', False):
+        # Running in a bundle
+        exe_dir = Path(sys.executable).parent
+        os.chdir(exe_dir)
+        logger.info(f"Changed working directory to {exe_dir}")
     # 1. Start Application
     app = QApplication(sys.argv)
     logger.info("QApplication initialized")
 
     # Load the stylesheet robustly
     script_dir = Path(__file__).resolve().parent
+    if getattr(sys, 'frozen', False):
+        # Running in a bundle (PyInstaller or Nuitka)
+        base_dir = Path(sys._MEIPASS)
+    else:
+        base_dir = script_dir
     # Assume the stylesheet is at the root of the project structure for Nuitka to find it easily
-    stylesheet_path = script_dir / "gui" / "style.qss"
+    stylesheet_path = base_dir / "gui" / "style.qss"
 
     try:
         # NOTE: Nuitka includes data files in the root of the build folder.
@@ -29,15 +40,7 @@ if __name__ == "__main__":
                 style_content = f.read()
             logger.info(f"Stylesheet loaded from {stylesheet_path}")
         else:
-            # Fallback for Nuitka build: load from execution folder
-            # Nuitka script uses 'gui/style.qss' -> 'style.qss' in build root
-            nuitka_fallback_path = script_dir / "style.qss"
-            if nuitka_fallback_path.exists():
-                with open(nuitka_fallback_path, "r", encoding="utf-8") as f:
-                    style_content = f.read()
-                logger.info(f"Stylesheet loaded from Nuitka fallback {nuitka_fallback_path}")
-            else:
-                logger.warning(f"Stylesheet not found at '{stylesheet_path}' or '{nuitka_fallback_path}'. Using default.")
+            logger.warning(f"Stylesheet not found at '{stylesheet_path}'. Using default.")
 
         if style_content:
             app.setStyleSheet(style_content)

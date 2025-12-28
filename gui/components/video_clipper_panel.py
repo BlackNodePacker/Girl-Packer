@@ -208,7 +208,7 @@ class VideoClipperPanel(QWidget):
         self.clip_list_widget.clear()
         self.reset_clip_buttons()
         self.video_slider.set_markers([])
-        QApplication.setOverrideCursor(Qt.WaitCursor)
+        QApplication.setOverrideCursor(Qt.WaitCursor)  # type: ignore
         self.true_duration_ms = int(video_splitter.get_video_duration(video_path) * 1000)
         QApplication.restoreOverrideCursor()
         self.player_widget.load_video(video_path)
@@ -223,7 +223,7 @@ class VideoClipperPanel(QWidget):
             params = dialog.get_split_parameters()
             if not params:
                 return
-            QApplication.setOverrideCursor(Qt.WaitCursor)
+            QApplication.setOverrideCursor(Qt.WaitCursor)  # type: ignore
             try:
                 if params["mode"] == "ai_suggest":
                     generated_clips_data = self.main_window.pipeline.suggest_clips(self.video_path)
@@ -260,9 +260,9 @@ class VideoClipperPanel(QWidget):
             item = self.clip_list_widget.item(i)
             widget = self.clip_list_widget.itemWidget(item)
             if widget:
-                widget.row_index = i
+                widget.row_index = i  # type: ignore
                 start, end = self.clips[i]["start"], self.clips[i]["end"]
-                widget.label.setText(
+                widget.label.setText(  # type: ignore
                     f"Clip {i + 1}: [{self._ms_to_time(start)} -> {self._ms_to_time(end)}]"
                 )
         self.update_markers()

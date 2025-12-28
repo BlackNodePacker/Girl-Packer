@@ -231,6 +231,7 @@ class MainWindow(QMainWindow):
     # [NEW] Add the workflow start method for the event maker
     def start_event_maker_workflow(self):
         self.workflow_manager.go_to("event_maker")
+        self.event_maker_panel.activate()
 
     # --- All other methods remain unchanged, included for completeness ---
     def _change_output_path(self):

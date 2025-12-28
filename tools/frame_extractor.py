@@ -12,11 +12,11 @@ from utils.file_ops import ensure_folder
 
 logger = get_logger("FFmpegFrameExtractor")
 
-FFMPEG_PATH = (
-    "ffmpeg.exe"
-    if getattr(sys, "frozen", False)
-    else "F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe"
-)
+if getattr(sys, "frozen", False):
+    base_dir = sys._MEIPASS
+    FFMPEG_PATH = os.path.join(base_dir, "ffmpeg.exe")
+else:
+    FFMPEG_PATH = "F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe"
 
 
 def _run_ffmpeg_command(command):

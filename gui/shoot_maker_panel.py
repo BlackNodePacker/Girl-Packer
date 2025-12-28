@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (
     QComboBox,
     QCheckBox,
     QSpinBox,
+    QAbstractItemView,
 )
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QPixmap
@@ -206,7 +207,7 @@ class ShootMakerPanel(QWidget):
         available_group = QGroupBox("Available Media")
         available_layout = QVBoxLayout(available_group)
         self.available_list = QListWidget()
-        self.available_list.setSelectionMode(QListWidget.ExtendedSelection)
+        self.available_list.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
         self.add_button = QPushButton("⬇️ Add to Shoot ⬇️")
         available_layout.addWidget(self.available_list)
         available_layout.addWidget(self.add_button)
@@ -235,7 +236,7 @@ class ShootMakerPanel(QWidget):
         preview_layout = QVBoxLayout(preview_group)
         self.preview_stack = QStackedWidget()
         self.image_preview_label = QLabel("Select an item to preview")
-        self.image_preview_label.setAlignment(Qt.AlignCenter)
+        self.image_preview_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.video_preview_player = PlayerWidget()
         self.preview_stack.addWidget(self.image_preview_label)
         self.preview_stack.addWidget(self.video_preview_player)
@@ -270,12 +271,12 @@ class ShootMakerPanel(QWidget):
             self.video_preview_player.stop_video()
             self.item_tagging_box.setEnabled(False)
             return
-        path = item.data(Qt.UserRole)
+        path = item.data(Qt.ItemDataRole.UserRole)
         if self.current_shoot_type == "Photo Shoot":
             pixmap = QPixmap(path)
             self.image_preview_label.setPixmap(
                 pixmap.scaled(
-                    self.image_preview_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation
+                    self.image_preview_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation
                 )
             )
         else:
@@ -308,7 +309,7 @@ class ShootMakerPanel(QWidget):
             path = source if isinstance(source, str) else source.get("path", "")
             name = os.path.basename(path)
             item = QListWidgetItem(name)
-            item.setData(Qt.UserRole, path)
+            item.setData(Qt.ItemDataRole.UserRole, path)
             self.available_list.addItem(item)
         self.step_stack.setCurrentWidget(self.step2_widget)
 
@@ -333,14 +334,14 @@ class ShootMakerPanel(QWidget):
 
     def _add_to_shoot(self):
         for item in self.available_list.selectedItems():
-            path = item.data(Qt.UserRole)
+            path = item.data(Qt.ItemDataRole.UserRole)
             if path not in self.shoot_data_buffer:
                 new_item = QListWidgetItem(f"✗ {os.path.basename(path)}")
-                new_item.setData(Qt.UserRole, path)
+                new_item.setData(Qt.ItemDataRole.UserRole, path)
                 self.shoot_list.addItem(new_item)
                 self.shoot_data_buffer[path] = {"source_path": path, "tags": {}}
         paths_in_shoot = [
-            self.shoot_list.item(i).data(Qt.UserRole) for i in range(self.shoot_list.count())
+            self.shoot_list.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.shoot_list.count())
         ]
         if paths_in_shoot:
             self.ai_analysis_requested.emit(paths_in_shoot)
@@ -350,13 +351,13 @@ class ShootMakerPanel(QWidget):
         if not selected_items:
             return
         for item in selected_items:
-            path = item.data(Qt.UserRole)
+            path = item.data(Qt.ItemDataRole.UserRole)
             row = self.shoot_list.row(item)
             self.shoot_list.takeItem(row)
             if path in self.shoot_data_buffer:
                 del self.shoot_data_buffer[path]
         paths_in_shoot = [
-            self.shoot_list.item(i).data(Qt.UserRole) for i in range(self.shoot_list.count())
+            self.shoot_list.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.shoot_list.count())
         ]
         if paths_in_shoot:
             self.ai_analysis_requested.emit(paths_in_shoot)
@@ -381,7 +382,7 @@ class ShootMakerPanel(QWidget):
         item = self.shoot_list.currentItem()
         if not item:
             return
-        path = item.data(Qt.UserRole)
+        path = item.data(Qt.ItemDataRole.UserRole)
         tags_to_apply = {
             "main_tag_text": self.main_tag_combo.currentText(),
             "action_group": self.action_group_combo.currentText(),
@@ -389,6 +390,7 @@ class ShootMakerPanel(QWidget):
         }
         self.shoot_data_buffer[path]["tags"] = tags_to_apply
         item.setText(f"✓ {os.path.basename(path)}")
+        logger.info(f"Applied tags to {os.path.basename(path)}: {tags_to_apply}")
 
     def _on_save_shoot(self):
         shoot_name = self.name_input.text().strip()
@@ -435,7 +437,7 @@ class ShootMakerPanel(QWidget):
         media_items = []
         for i in range(self.shoot_list.count()):
             item = self.shoot_list.item(i)
-            path = item.data(Qt.UserRole)
+            path = item.data(Qt.ItemDataRole.UserRole)
             data = self.shoot_data_buffer.get(path)
             if (
                 not data

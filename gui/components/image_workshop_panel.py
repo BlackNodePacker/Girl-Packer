@@ -104,7 +104,7 @@ class ImageWorkshopPanel(QWidget):
     def __init__(self, main_window, parent=None):
         super().__init__(parent)
         self.main_window = main_window
-        self.yolo_labels = self.main_window.pipeline.yolo_model.class_names
+        self.yolo_labels = self.main_window.pipeline.yolo_model.class_names if self.main_window.pipeline.yolo_model else []
         self.yolo_results_cache = {}
         # [FIX] تغيير اسم البفر ليعكس أنه يمسك البيانات لكل إطار
         self.frame_tag_buffer = {}  # Key: frame_path, Value: list of tagged_items
@@ -303,7 +303,7 @@ class ImageWorkshopPanel(QWidget):
 
         if detection_id and new_bbox:
             path = self.current_frame_path
-            detections = self.yolo_results_cache.get(path, [])
+            detections = self.yolo_results_cache.get(path, {}).get('detections', [])
 
             for d in detections:
                 if d.get("id") == detection_id:
@@ -322,12 +322,12 @@ class ImageWorkshopPanel(QWidget):
             )
             if reply == QMessageBox.StandardButton.Yes:
                 path = self.current_frame_path
-                detections = self.yolo_results_cache.get(path, [])
+                detections = self.yolo_results_cache.get(path, {}).get('detections', [])
                 id_to_delete = detection_to_delete.get("id")
 
                 if id_to_delete:
                     # إزالة من قائمة YOLO الأصلية
-                    self.yolo_results_cache[path] = [
+                    self.yolo_results_cache[path]['detections'] = [
                         d for d in detections if d.get("id") != id_to_delete
                     ]
 
@@ -365,10 +365,10 @@ class ImageWorkshopPanel(QWidget):
 
         if detection_id:
             path = self.current_frame_path
-            detections = self.yolo_results_cache.get(path, [])
+            detections = self.yolo_results_cache.get(path, {}).get('detections', [])
 
             # إزالة من قائمة YOLO الأصلية
-            self.yolo_results_cache[path] = [d for d in detections if d.get("id") != detection_id]
+            self.yolo_results_cache[path]['detections'] = [d for d in detections if d.get("id") != detection_id]
 
             # إزالة من قائمة Tags المؤكدة
             if path in self.frame_tag_buffer:
@@ -406,9 +406,9 @@ class ImageWorkshopPanel(QWidget):
             }
             # يجب التأكد من وجود current_frame_path في cache
             if self.current_frame_path not in self.yolo_results_cache:
-                self.yolo_results_cache[self.current_frame_path] = []
+                self.yolo_results_cache[self.current_frame_path] = {'detections': [], 'label_path': None}
 
-            self.yolo_results_cache[self.current_frame_path].append(new_detection)
+            self.yolo_results_cache[self.current_frame_path]['detections'].append(new_detection)
 
             self._display_current_frame()
             self._on_box_clicked(new_detection)
@@ -823,7 +823,7 @@ class ImageWorkshopPanel(QWidget):
         missing_tags_count = 0
 
         for path in self.frame_paths:
-            yolo_dets = self.yolo_results_cache.get(path, [])
+            yolo_dets = self.yolo_results_cache.get(path, {}).get('detections', [])
             confirmed_tags = self.frame_tag_buffer.get(path, [])
 
             # حساب عدد الاكتشافات التي لم يتم تأكيدها بعد

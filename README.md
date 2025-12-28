@@ -190,4 +190,5 @@ See `todo_plan.md` for current development roadmap and upcoming features.
 
 ## License
 
-[Add license if any]
+This project is released under a proprietary license.
+See the LICENSE file for full terms and restrictions.

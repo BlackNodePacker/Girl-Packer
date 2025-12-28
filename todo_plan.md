@@ -50,8 +50,8 @@
 - **Build Scripts**: Use `build_nuitka.py` for standalone EXE, ensuring data files are included.
 
 ## Publishing Steps
-1. **Prepare Release**: ✅ Tagged v1.1.0 in Git, committed changes.
-2. **Distribute**: Create GitHub release with CHANGELOG.md and EXE download (once built).
+1. **Prepare Release**: ✅ Tagged v1.1.0 in Git, committed changes including EXE.
+2. **Distribute**: Create GitHub release with CHANGELOG.md and EXE download (dist/GirlPacker.exe).
 3. **Monitor**: Track downloads, issues, feedback.
 
 2. **Distribute**:

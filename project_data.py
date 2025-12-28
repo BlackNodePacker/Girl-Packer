@@ -167,6 +167,8 @@ class Project:
             save_json(full_event_data, json_file_path)
             success_json = True
             logger.info(f"Event JSON data saved to: {json_file_path}")
+            # Add to export_data for inclusion in final pack
+            self.export_data.setdefault("events", {})[event_name] = full_event_data
         except Exception as e:
             logger.error(f"Failed to save event JSON data: {e}")
 

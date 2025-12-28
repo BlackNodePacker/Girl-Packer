@@ -219,6 +219,10 @@ class EventMakerPanel(QWidget):
         # New: Clean up VLC resources when the widget is destroyed
         self.destroyed.connect(self.video_player.release_player)
 
+    def activate(self):
+        """Load media assets when the panel is activated."""
+        self._populate_media_list()
+
     def _on_tab_changed(self, index):
         """Saves the script content if the user is leaving the Script Editor tab and refreshes the media list if entering the Media Library tab."""
         # Index 1 هو الـ index الخاص بـ "Script Editor"

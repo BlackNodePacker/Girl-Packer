@@ -12,11 +12,11 @@ from tools.background_remover import remove_background
 
 logger = get_logger("MediaExporter")
 # يجب تعديل مسار FFMPEG ليتناسب مع بيئتك (F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe)
-FFMPEG_PATH = (
-    "ffmpeg.exe"
-    if getattr(sys, "frozen", False)
-    else "F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe"
-)
+if getattr(sys, "frozen", False):
+    base_dir = sys._MEIPASS
+    FFMPEG_PATH = os.path.join(base_dir, "ffmpeg.exe")
+else:
+    FFMPEG_PATH = "F:/ffmpeg-8.0-essentials_build/bin/ffmpeg.exe"
 # Constants for image resizing
 SHOOT_WIDTH = 1920
 SHOOT_HEIGHT = 1080
@@ -477,8 +477,8 @@ def export_media_pack(project, pipeline):
     """Main entry point for exporting the complete media pack."""
     char_name = project.character_name
     pack_root = os.path.join(project.final_output_path, sanitize_filename(char_name))
-    # Ensure event definitions are pulled from the pipeline manager before export
-    project.export_data["events"] = pipeline.tag_manager.event_definitions
+    # Ensure event definitions are pulled from the project export_data (only saved events)
+    # project.export_data["events"] = pipeline.tag_manager.event_definitions  # Removed to avoid auto-inclusion of all definitions
     kwargs = project.export_data
 
     # 🆕 1. تجميع بيانات التدريب قبل التصدير والمسح

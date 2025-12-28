@@ -10,8 +10,9 @@ logger = get_logger("VideoSplitter")
 
 # --- Dynamic FFmpeg/FFprobe Path Logic ---
 if getattr(sys, "frozen", False):
-    FFMPEG_PATH = "ffmpeg.exe"
-    FFPROBE_PATH = "ffprobe.exe"
+    base_dir = sys._MEIPASS
+    FFMPEG_PATH = os.path.join(base_dir, "ffmpeg.exe")
+    FFPROBE_PATH = os.path.join(base_dir, "ffprobe.exe")
 else:
     FFMPEG_DIR = "F:/ffmpeg-8.0-essentials_build/bin"
     FFMPEG_PATH = os.path.join(FFMPEG_DIR, "ffmpeg.exe")

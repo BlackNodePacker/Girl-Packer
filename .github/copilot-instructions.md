@@ -18,7 +18,7 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
 - **Logging**: loguru via `tools/logger.py` with context-specific loggers
 - **Config**: YAML-based settings in `config.yaml` loaded via `utils/config_loader.py`
 - **Assets**: Media extensions `('.webp', '.png', '.jpg', '.jpeg', '.webm', '.mp4')`
-- **Ren'Py Output**: Events saved as JSON + .rpy scripts in project output/game/
+- **Ren'Py Output**: Events saved as JSON + .rpy scripts in project output/events/
 
 ## Critical Workflows
 - **Photo Maker**: `workflows/photo_maker_workflow.py` - Frame extraction → YOLO detection → cropping/classification → final images

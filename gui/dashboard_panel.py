@@ -143,5 +143,5 @@ class DashboardPanel(QWidget):
 
     def open_support_link(self):
         """Open the support link in the default browser."""
-        url = QUrl("https://github.com/sponsors/ahmedasker115-cloud")  # Or Patreon link
+        url = QUrl("https://www.patreon.com/15309479/join")  # Or Patreon link
         QDesktopServices.openUrl(url)

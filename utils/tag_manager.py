@@ -1,5 +1,6 @@
 ﻿import os
 import json
+import sys
 from tools.logger import get_logger
 
 logger = get_logger("TagManager")
@@ -7,7 +8,11 @@ logger = get_logger("TagManager")
 
 class TagManager:
     def __init__(self, db_dir="database"):
-        self.db_dir = db_dir
+        if getattr(sys, 'frozen', False):
+            base_dir = os.path.join(sys._MEIPASS, db_dir)
+        else:
+            base_dir = db_dir
+        self.db_dir = base_dir
         self.asset_tags_dir = os.path.join(self.db_dir, "asset_tags")
         self._load_all_data()
 

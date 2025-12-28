@@ -43,7 +43,7 @@ def split_video(video_path: str, output_folder: str, segment_length: int = 10):
 
     for i in range(0, total_frames, frames_per_segment):
         segment_path = os.path.join(output_folder, f"segment_{i:05d}.avi")
-        fourcc = cv2.VideoWriter_fourcc(*"XVID")
+        fourcc = cv2.VideoWriter_fourcc(*"XVID")  # type: ignore
         out = cv2.VideoWriter(segment_path, fourcc, fps, (int(cap.get(3)), int(cap.get(4))))
 
         cap.set(cv2.CAP_PROP_POS_FRAMES, i)
@@ -132,7 +132,7 @@ def create_thumbnail_from_video(video_path: str, target_size: int = 128):
     )
 
     # 3. Save to Cache
-    q_image.save(cache_path, "PNG")
+    q_image.save(cache_path)
     logger.info(f"Generated and cached thumbnail for: {os.path.basename(video_path)}")
 
     return q_image

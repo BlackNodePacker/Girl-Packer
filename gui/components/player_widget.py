@@ -2,7 +2,7 @@
 
 import sys
 import vlc
-from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QFrame, QVBoxLayout, QSizePolicy
 from PySide6.QtGui import QPalette, QColor
 
 from tools.logger import get_logger
@@ -21,6 +21,8 @@ class PlayerWidget(QWidget):
         palette.setColor(QPalette.ColorGroup.All, QPalette.ColorRole.Window, QColor(0, 0, 0))
         self.videoframe.setPalette(palette)
         self.videoframe.setAutoFillBackground(True)
+        self.videoframe.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.videoframe.setMinimumSize(320, 240)
 
         vbox = QVBoxLayout(self)
         vbox.setContentsMargins(0, 0, 0, 0)
