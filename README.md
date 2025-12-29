@@ -13,13 +13,6 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
 - **Pack Review and Rating**: Analyze completed packs for quality, errors, and rating before export (integrated with PackAnalyzer).
 - **Auto-Pack (Pro Users)**: Automated pack creation from raw media using AI workflows (requires pro verification via Patreon key).
 
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/ahmedasker115-cloud/Girl-Packer.git
-   cd Girl-Packer
-   ```
 
 2. Create and activate virtual environment:
    ```bash

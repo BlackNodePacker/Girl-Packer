@@ -484,9 +484,15 @@ def export_media_pack(project, pipeline):
     # 🆕 1. تجميع بيانات التدريب قبل التصدير والمسح
     _collect_training_data(kwargs.get("approved_images", []), pipeline)
 
+    # If this is an add-on, do not delete the existing pack_root; otherwise recreate it
     if os.path.exists(pack_root):
-        shutil.rmtree(pack_root)
-    ensure_folder(pack_root)
+        if project.addon_mode:
+            logger.info(f"Add-on mode: preserving existing pack at {pack_root}")
+        else:
+            shutil.rmtree(pack_root)
+            ensure_folder(pack_root)
+    else:
+        ensure_folder(pack_root)
     logger.info(f"--- Starting Final Export for '{char_name}' to '{pack_root}' ---")
 
     # 2. التصدير الفعلي

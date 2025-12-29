@@ -21,6 +21,12 @@ class Project:
         self.character_type = "Girl"
         self.final_output_path = ""
         self.yolo_analysis_cache = {}
+        # Whether the current user/project has Pro features enabled
+        self.pro_user = False
+        # Add-on mode: when True, this project represents an add-on to an existing pack
+        self.addon_mode = False
+        # Components selected for add-on (e.g., ['fullbody', 'body', 'events'])
+        self.addon_components = []
         # تم تحديث export_data ليحتوي على الحقول التي نستخدمها في المشروع
         self.export_data = {
             # الصور التي تم تحديدها واعتمادها من PhotoMaker

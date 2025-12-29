@@ -1,0 +1,10 @@
+QWidget { background-color: #172821; color: #d7e6dd; }
+QGroupBox { border: 1px solid #244033; margin-top: 8px; }
+QGroupBox::title { subcontrol-origin: margin; left: 8px; padding: 0 3px; }
+QPushButton { background-color: #274432; color: #e7f3ea; border: 1px solid #31533f; padding: 6px; }
+QPushButton#ConfirmButton { background-color: #2f5a40; }
+QLineEdit, QTextEdit { background-color: #0f1a14; color: #e7f3ea; border: 1px solid #22382d; }
+QLabel#TitleLabel { font-size: 18px; font-weight: bold; color: #e7f3ea; }
+QProgressBar { background: #0b1812; color: #cfe8d8; }
+QMenuBar { background: #13231b; color: #d7e6dd; }
+QToolTip { background-color: #0b1110; color: #e6f0e8; border: 1px solid #274432; }

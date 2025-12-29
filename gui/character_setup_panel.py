@@ -32,6 +32,35 @@ from tools.logger import get_logger
 logger = get_logger("CharacterSetupPanel")
 
 
+class ComponentSelectionDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        from PySide6.QtWidgets import QVBoxLayout, QCheckBox, QDialogButtonBox
+
+        self.setWindowTitle("Add-on Components")
+        layout = QVBoxLayout(self)
+        self.checkboxes = {}
+        for name, label in [
+            ("fullbody", "Fullbody images"),
+            ("body", "Body parts"),
+            ("clothing", "Clothing"),
+            ("events", "Events"),
+            ("photos", "Photoshoots"),
+            ("videos", "Tagged Clips"),
+        ]:
+            cb = QCheckBox(label)
+            layout.addWidget(cb)
+            self.checkboxes[name] = cb
+
+        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons.accepted.connect(self.accept)
+        buttons.rejected.connect(self.reject)
+        layout.addWidget(buttons)
+
+    def get_selected(self):
+        return [k for k, cb in self.checkboxes.items() if cb.isChecked()]
+
+
 class CharacterSetupPanel(QWidget):
     project_started = Signal()
 
@@ -265,7 +294,47 @@ class CharacterSetupPanel(QWidget):
             self.project.source_image_paths = []
             self.last_input_path = os.path.dirname(fp)
             self.settings.setValue("last_input_path", self.last_input_path)
-            self.source_path_label.setText(os.path.basename(fp))
+            # Ask if this is a full pack source or an add-on
+            from PySide6.QtWidgets import QMessageBox
+
+            choice = QMessageBox.question(
+                self,
+                "Select Mode",
+                "Do you want to create a Full Pack from this video?\n(Choose 'No' to create an Add-on with specific components)",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                QMessageBox.StandardButton.Yes,
+            )
+
+            if choice == QMessageBox.StandardButton.No:
+                # Add-on flow: prompt for components
+                dlg = ComponentSelectionDialog(self)
+                if dlg.exec() == QDialog.DialogCode.Accepted:
+                    comps = dlg.get_selected()
+                    self.project.addon_mode = True
+                    self.project.addon_components = comps
+                    # Ask the user to select the existing pack folder to add onto
+                    pack_dir = QFileDialog.getExistingDirectory(self, "Select Existing Pack Folder (character folder)")
+                    if pack_dir:
+                        # Set project to point to selected pack
+                        existing_char = os.path.basename(os.path.normpath(pack_dir))
+                        self.project.character_name = existing_char
+                        # final_output_path should be parent so export_media_pack will compute pack_root correctly
+                        self.project.final_output_path = os.path.dirname(os.path.normpath(pack_dir))
+                        self.source_path_label.setText(f"{os.path.basename(fp)} (Add-on -> {existing_char})")
+                    else:
+                        # cancelled selecting pack target, revert
+                        self.project.source_video_path = None
+                        self.project.addon_mode = False
+                        self.project.addon_components = []
+                        self.source_path_label.setText("No source selected.")
+                else:
+                    # user cancelled component selection, revert selection
+                    self.project.source_video_path = None
+                    self.source_path_label.setText("No source selected.")
+            else:
+                self.project.addon_mode = False
+                self.project.addon_components = []
+                self.source_path_label.setText(os.path.basename(fp))
 
     def _select_image_folder(self):
         fp = QFileDialog.getExistingDirectory(self, "Select Image Folder", self.last_input_path)

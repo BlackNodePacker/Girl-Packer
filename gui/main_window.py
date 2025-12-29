@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import QSettings, QThread, Qt, QUrl
 from PySide6.QtGui import QDesktopServices
+from PySide6.QtWidgets import QApplication
 
 from .dashboard_panel import DashboardPanel
 from .ai_training_panel import AITrainingPanel
@@ -22,6 +23,10 @@ from .photo_maker_panel import PhotoMakerPanel
 from .shoot_maker_panel import ShootMakerPanel
 from .character_setup_panel import CharacterSetupPanel
 from .event_maker_panel import EventMakerPanel  # [NEW] Import the new panel
+from .auto_pack_panel import AutoPackPanel
+from .pack_review_panel import PackReviewPanel
+from .settings_panel2 import SettingsPanel
+from .report_bug_dialog import ReportBugDialog
 from .components import ExportWorker, FrameExtractionDialog
 from tools.logger import get_logger
 from tools import video_splitter
@@ -33,6 +38,7 @@ from workflows.workflow_manager import WorkflowManager
 from workflows.photo_maker_workflow import PhotoMakerWorkflow
 from workflows.vid_maker_workflow import VidMakerWorkflow
 from workflows.shoot_maker_workflow import ShootMakerWorkflow
+from utils.pro_verifier import verify_license
 
 logger = get_logger("MainWindow")
 
@@ -45,6 +51,25 @@ class MainWindow(QMainWindow):
         logger.debug(f"Config loaded: {self.config}")
         self.settings = QSettings("GameMediaTool", "GirlPacker")
         self.project = Project()
+        # Initialize pro_user from settings; attempt remote verification if configured
+        try:
+            stored_license = self.settings.value("pro_license", "")
+            pro_active_setting = self.settings.value("pro_active", False)
+            # Default to boolean for stored flag
+            pro_active_flag = bool(pro_active_setting) if pro_active_setting is not None else False
+            verify_url = self.config.get("pro", {}).get("verify_url") if isinstance(self.config, dict) else None
+            if stored_license and verify_url:
+                try:
+                    valid = verify_license(stored_license, verify_url=verify_url)
+                    self.project.pro_user = bool(valid)
+                    self.settings.setValue("pro_active", bool(valid))
+                except Exception:
+                    self.project.pro_user = bool(pro_active_flag)
+            else:
+                # Use stored flag if no remote verification configured
+                self.project.pro_user = bool(pro_active_flag)
+        except Exception:
+            self.project.pro_user = False
         logger.info("Project instance created")
         self.tag_manager = TagManager()
         logger.info("TagManager initialized")
@@ -58,6 +83,14 @@ class MainWindow(QMainWindow):
         self._setup_ui_panels()
         self.workflow_manager = WorkflowManager(self, self.view_stack)
         self._connect_signals()
+        # Apply saved theme
+        try:
+            saved_theme = self.settings.value("theme", "light")
+            self.apply_theme(saved_theme)
+        except Exception:
+            pass
+
+        self._report_dialog = None
 
     # **********************************************
     # * NEW METHODS FOR EVENTMAKERPANEL INTERFACE *
@@ -120,6 +153,9 @@ class MainWindow(QMainWindow):
         self.dashboard_panel = DashboardPanel(self)
         self.ai_training_panel = AITrainingPanel(self)
         self.data_review_panel = DataReviewPanel(self)
+        self.settings_panel = SettingsPanel(self)
+        self.auto_pack_panel = AutoPackPanel(self)
+        self.pack_review_panel = PackReviewPanel(self)
         self.vids_maker_panel = VidsMakerPanel(self)
         self.photo_maker_panel = PhotoMakerPanel(self)
         self.shoot_maker_panel = ShootMakerPanel(self)
@@ -131,6 +167,9 @@ class MainWindow(QMainWindow):
             self.setup_panel,
             self.dashboard_panel,
             self.ai_training_panel,
+            self.settings_panel,
+            self.auto_pack_panel,
+            self.pack_review_panel,
             self.data_review_panel,
             self.vids_maker_panel,
             self.photo_maker_panel,
@@ -151,6 +190,7 @@ class MainWindow(QMainWindow):
         self.dashboard_panel.event_maker_requested.connect(
             self.start_event_maker_workflow
         )  # [NEW] Connect the dashboard signal
+        self.dashboard_panel.auto_pack_requested.connect(self.start_auto_pack_workflow)
 
         self.dashboard_panel.export_pack_requested.connect(self._start_final_export)
         self.dashboard_panel.ai_center_requested.connect(
@@ -198,6 +238,10 @@ class MainWindow(QMainWindow):
             lambda: self.workflow_manager.go_to("data_review")
         )
 
+    def start_auto_pack_workflow(self):
+        self.workflow_manager.go_to("auto_pack")
+        # Panel handles its own activation
+
     def go_to_dashboard(self):
         if self.project.source_type == "video" and self.project.video_duration == 0:
             try:  # Add try-except block for robustness
@@ -242,6 +286,33 @@ class MainWindow(QMainWindow):
             self.project.final_output_path = new_path
             self.settings.setValue("final_output_path", new_path)
             self.dashboard_panel.output_path_label.setText(new_path)
+
+    def open_url(self, url: str):
+        try:
+            QDesktopServices.openUrl(QUrl(url))
+        except Exception as e:
+            logger.error(f"Failed to open URL {url}: {e}")
+
+    def show_report_dialog(self):
+        if not self._report_dialog:
+            self._report_dialog = ReportBugDialog(self)
+        self._report_dialog.exec()
+
+    def apply_theme(self, theme_name: str):
+        """Load QSS from `gui/themes/{theme_name}.qss` and apply to QApplication."""
+        try:
+            base = os.path.join(os.getcwd(), "gui", "themes")
+            qss_path = os.path.join(base, f"{theme_name}.qss")
+            if os.path.exists(qss_path):
+                with open(qss_path, "r", encoding="utf-8") as f:
+                    qss = f.read()
+                QApplication.instance().setStyleSheet(qss)
+                self.settings.setValue("theme", theme_name)
+                logger.info(f"Applied theme: {theme_name}")
+            else:
+                logger.warning(f"Theme file not found: {qss_path}")
+        except Exception as e:
+            logger.error(f"Failed to apply theme {theme_name}: {e}")
 
     def _start_final_export(self):
         reply = QMessageBox.question(

@@ -113,7 +113,25 @@ class YOLOWorker(QObject):
                             y_center = (y1 + y2) / 2 / h
                             width = (x2 - x1) / w
                             height = (y2 - y1) / h
-                            class_id = 0  # Assume class 0 for detection
+                            # Determine class id from model if possible
+                            class_id = 0
+                            try:
+                                # model may expose class names as a list or dict
+                                model_names = getattr(yolo_model_instance, 'class_names', None) or getattr(yolo_model_instance, 'names', None)
+                                if isinstance(model_names, dict):
+                                    # dict mapping id->name
+                                    # find the key for this label
+                                    label_name = det.get('label')
+                                    for k, v in model_names.items():
+                                        if v == label_name:
+                                            class_id = int(k)
+                                            break
+                                elif isinstance(model_names, (list, tuple)):
+                                    label_name = det.get('label')
+                                    if label_name in model_names:
+                                        class_id = int(model_names.index(label_name))
+                            except Exception:
+                                class_id = 0
                             f.write(f"{class_id} {x_center:.6f} {y_center:.6f} {width:.6f} {height:.6f}\n")
                     yolo_results[frame_path] = {'detections': detections, 'label_path': label_path}
                 else:

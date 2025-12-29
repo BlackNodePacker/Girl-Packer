@@ -1,0 +1,4 @@
+/* Classic theme */
+QWidget { background: #f8f3e7; color: #222222; }
+QPushButton { background: #e8dcc5; border: 1px solid #bfaF90; padding: 4px; }
+#TitleLabel { font-size: 18px; font-weight: bold; }

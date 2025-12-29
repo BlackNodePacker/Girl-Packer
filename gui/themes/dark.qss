@@ -1,0 +1,5 @@
+/* Dark theme */
+QWidget { background: #1e1e1e; color: #eaeaea; }
+QPushButton { background: #2a2a2a; border: 1px solid #444444; padding: 4px; }
+QLineEdit, QTextEdit { background: #2a2a2a; color: #eaeaea; }
+#TitleLabel { font-size: 18px; font-weight: bold; }

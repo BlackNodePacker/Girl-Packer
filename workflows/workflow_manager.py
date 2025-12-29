@@ -21,6 +21,9 @@ class WorkflowManager:
             "dashboard": main_window.dashboard_panel,
             "ai_center": main_window.ai_training_panel,  # موجودة بالفعل
             "data_review": main_window.data_review_panel,
+            "auto_pack": main_window.auto_pack_panel,
+            "pack_review": main_window.pack_review_panel,
+            "settings": main_window.settings_panel,
             "vid_maker": main_window.vids_maker_panel,
             "photo_maker": main_window.photo_maker_panel,
             "shoot_maker": main_window.shoot_maker_panel,
