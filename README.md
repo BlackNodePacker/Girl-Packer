@@ -17,7 +17,7 @@ Girl Packer is a PySide6-based GUI tool for processing media assets (images/vide
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/ahmedasker115-cloud/Girl-Packer.git
+   git clone [https://github.com/BlackNodePacker/Girl-Packer.git]
    cd Girl-Packer
    ```
 
